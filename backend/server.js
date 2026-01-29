@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import brandRoutes from './routes/brand.route.js';
 import assetRoutes from './routes/asset.route.js';
+import campaignRoutes from './routes/campaign.route.js';
 dotenv.config();
 
 const app = express();
@@ -21,7 +22,7 @@ app.get('/health', (req, res) => {
 // app.use('/api/auth', authRoutes);
 app.use('/api/brands', brandRoutes);
 app.use('/api/assets', assetRoutes);
-// app.use('/api/campaigns', campaignRoutes);
+app.use('/api/campaigns', campaignRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

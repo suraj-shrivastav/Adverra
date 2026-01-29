@@ -3,6 +3,7 @@ import assetPrompts from "../utils/assets.prompts.js";
 import { uploadBase64Image } from "../config/cloudinary.js";
 import { imageUrlToBase64 } from "../utils/imageUrlToBase64.js";
 import { uploadImageToGemini } from "../utils/uploadImage.js";
+import { supabase } from "../config/supabase.js";
 import fs from "fs";
 
 
@@ -31,7 +32,7 @@ const constructBrandPrompt = (brandData) => {
 
 const buildRawImagePrompt = ({ designType, prompt, brandData }) => {
     const selectedStyle =
-        assetPrompts[designType] || assetPrompts["genZ_prompt"];
+        assetPrompts[designType] || assetPrompts["bold_dark_grooming_prompt"];
     const brandContextBlock = constructBrandPrompt(brandData);
 
     return `
@@ -93,46 +94,81 @@ const buildRawImagePrompt = ({ designType, prompt, brandData }) => {
 // };
 
 
-const buildImageParts = async ({ optimizedPrompt, referenceImages }) => {
-    const parts = [];
-
-    if (referenceImages && Array.isArray(referenceImages)) {
-        for (const item of referenceImages) {
-            if (typeof item === 'string') {
-                if (item.includes("generativelanguage.googleapis.com")) {
-                    // It's a Gemini File API URI
+const buildImageParts = async ({ referenceImages, optimizedPrompt }) => {
+    try {
+        const parts = [];
+        if (referenceImages && Array.isArray(referenceImages)) {
+            for (const file of referenceImages) {
+                // If file is an object with uri and mimeType
+                if (file.uri && file.mimeType) {
                     parts.push({
                         fileData: {
-                            fileUri: item,
-                            mimeType: "image/jpeg", // We might want to pass this or detect it, usually jpeg/png
-                        }
+                            fileUri: file.uri,
+                            mimeType: file?.mimeType,
+                        },
                     });
-                } else {
-                    // It's a standard URL
-                    const referenceImage = await imageUrlToBase64(item);
+                } else if (typeof file === "string") {
+                    // Fallback if it's just a URI string
                     parts.push({
-                        inlineData: {
-                            data: referenceImage.data,
-                            mimeType: referenceImage.mimeType,
+                        fileData: {
+                            fileUri: file,
+                            // mimeType: "image/png", // Default mimeType
                         },
                     });
                 }
-            } else if (item.uri && item.mimeType) {
-                // It's an object with uri and mimeType (from our new upload endpoint)
-                parts.push({
-                    fileData: {
-                        fileUri: item.uri,
-                        mimeType: item.mimeType,
-                    }
-                });
             }
         }
+
+        if (optimizedPrompt) {
+            parts.push({ text: optimizedPrompt });
+        }
+        return parts;
+    } catch (error) {
+        console.error("Error in buildImageParts:", error);
+        throw error;
     }
-
-    parts.push({ text: optimizedPrompt });
-
-    return parts;
 };
+
+// const buildImageParts = async ({ optimizedPrompt, referenceImages }) => {
+//     const parts = [];
+
+//     if (referenceImages && Array.isArray(referenceImages)) {
+//         for (const item of referenceImages) {
+//             if (typeof item === 'string') {
+//                 if (item.includes("generativelanguage.googleapis.com")) {
+//                     // It's a Gemini File API URI
+//                     parts.push({
+//                         fileData: {
+//                             fileUri: item,
+//                             mimeType: "image/jpeg", // We might want to pass this or detect it, usually jpeg/png
+//                         }
+//                     });
+//                 } else {
+//                     // It's a standard URL
+//                     const referenceImage = await imageUrlToBase64(item);
+//                     parts.push({
+//                         inlineData: {
+//                             data: referenceImage.data,
+//                             mimeType: referenceImage.mimeType,
+//                         },
+//                     });
+//                 }
+//             } else if (item.uri && item.mimeType) {
+//                 // It's an object with uri and mimeType (from our new upload endpoint)
+//                 parts.push({
+//                     fileData: {
+//                         fileUri: item.uri,
+//                         mimeType: item.mimeType,
+//                     }
+//                 });
+//             }
+//         }
+//     }
+
+//     parts.push({ text: optimizedPrompt });
+
+//     return parts;
+// };
 
 
 export const generateImage = async (req, res) => {
@@ -140,7 +176,6 @@ export const generateImage = async (req, res) => {
         const { designType, prompt, brandData, referenceImages } = req.body;
         const start = Date.now();
 
-        /* ------------------------- 1. Prompt Pipeline ------------------------- */
         const rawPrompt = buildRawImagePrompt({
             designType,
             prompt,
@@ -150,15 +185,13 @@ export const generateImage = async (req, res) => {
         // const optimizedPrompt = await generatePrompt(rawPrompt);
         const optimizedPrompt = rawPrompt;
 
-        console.log("Final Prompt Sent to Model:", optimizedPrompt);
+        // console.log("Image Parts: ", referenceImages);
+        // console.log("Final Prompt Sent to Model:", optimizedPrompt);
 
-        /* ------------------------- 2. Image Parts -------------------------- */
-        const imgParts = await buildImageParts({
-            optimizedPrompt,
-            referenceImages,
-        });
+        const imgParts = await buildImageParts({ referenceImages, optimizedPrompt });
 
-        /* ------------------------- 3. Image Generation ------------------------- */
+        console.log("Image Parts: ", imgParts);
+
         const systemInstruction = `
 You are an expert brand marketing strategist and designer. Your goal is to create High Quality Marketing Assets for Brands.
 DO NOT generate text, watermarks, or logos inside the image.
@@ -170,17 +203,17 @@ Ensure the image is strictly safe for work and follows brand safety guidelines.
 
         const response = await genAI.models.generateContent({
             model: "gemini-3-pro-image-preview",
-            systemInstruction,
-            contents: [{ role: "user", parts: imgParts }],
+            contents: { role: "user", parts: imgParts },
+            systemInstruction: systemInstruction,
             config: {
                 imageConfig: {
-                    aspectRatio: "16:9",
-                    imageSize: "2K",
+                    aspectRatio: '16:9',
+                    resolution: '2K',
                 },
-            },
+                tools: [{ googleSearch: {} }],
+            }
         });
 
-        /* ------------------------- 4. Image Extraction ------------------------- */
         const parts = response.candidates?.[0]?.content?.parts || [];
         const imagePart = parts.find((p) =>
             p.inlineData?.mimeType?.startsWith("image/")
@@ -193,13 +226,27 @@ Ensure the image is strictly safe for work and follows brand safety guidelines.
             });
         }
 
-        /* ------------------------- 5. Upload & Response ------------------------ */
         const base64Image = imagePart.inlineData.data;
         const mimeType = imagePart.inlineData.mimeType;
 
         const uploadedImage = await uploadBase64Image(base64Image, mimeType);
 
         const timeTaken = (Date.now() - start) / 1000;
+        console.log(`Image Generated in: ${timeTaken} seconds`)
+
+        const { data, error } = await supabase
+            .from("brand_assets")
+            .insert({
+                userId: req.user?.id || "736ec2b1-9ba6-4ee9-9854-b23cd21d0061",
+                img_url: uploadedImage.secure_url,
+                img_meta_data: {
+                    publicId: uploadedImage.public_id,
+                    width: uploadedImage.width,
+                    height: uploadedImage.height,
+                    format: uploadedImage.format,
+                }
+            })
+        if (error) throw error;
 
         return res.status(200).json({
             success: true,
@@ -243,8 +290,9 @@ export const getAssets = async (req, res) => {
 
 export const uploadReferenceImage = async (req, res) => {
     try {
-
-
+        const { file } = req;
+        console.log(file);
+        const geminiFile = await uploadImageToGemini(file.path, file.mimetype, file.originalname);
         return res.status(200).json({
             success: true,
             message: "File uploaded to Gemini successfully",
@@ -255,18 +303,7 @@ export const uploadReferenceImage = async (req, res) => {
             }
         });
     } catch (error) {
-        console.error("Error in uploadReferenceImage:", error);
 
-        // Ensure the file is deleted even if upload fails
-        if (req.file?.path && fs.existsSync(req.file.path)) {
-            fs.unlinkSync(req.file.path);
-        }
-
-        return res.status(500).json({
-            success: false,
-            message: "Failed to upload file to Gemini",
-            error: error.message
-        });
     }
 };
 
