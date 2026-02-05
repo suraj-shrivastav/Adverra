@@ -5,6 +5,7 @@ import brandRoutes from './routes/brand.route.js';
 import assetRoutes from './routes/asset.route.js';
 import campaignRoutes from './routes/campaign.route.js';
 import audioRoutes from './routes/audio.route.js';
+import authRoutes from './routes/auth.route.js';
 dotenv.config();
 
 const app = express();
@@ -20,7 +21,7 @@ app.get('/health', (req, res) => {
 });
 
 // API routes will be added here
-// app.use('/api/auth', authRoutes);
+app.use('/api/auth', authRoutes);
 app.use('/api/brands', brandRoutes);
 app.use('/api/assets', assetRoutes);
 app.use('/api/audio', audioRoutes);

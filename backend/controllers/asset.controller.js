@@ -247,7 +247,14 @@ Ensure the image is strictly safe for work and follows brand safety guidelines.
                 }
             })
         if (error) throw error;
-
+        console.log("data: ", {
+            imageUrl: uploadedImage.secure_url,
+            publicId: uploadedImage.public_id,
+            width: uploadedImage.width,
+            height: uploadedImage.height,
+            format: uploadedImage.format,
+            timeTaken: `Image Generated in ${timeTaken} seconds`,
+        });
         return res.status(200).json({
             success: true,
             imageUrl: uploadedImage.secure_url,

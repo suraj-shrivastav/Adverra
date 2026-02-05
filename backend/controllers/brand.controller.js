@@ -80,24 +80,26 @@ export const addCustomBrandData = async (req, res) => {
 
 export const getAllBrandData = async (req, res) => {
     try {
-        const userId = req.user?.id;
+        // const userId = req.user?.id;
 
-        if (!userId) {
-            return res.status(401).json({ error: "Unauthorized" });
-        }
+        // if (!userId) {
+        //     return res.status(401).json({ error: "Unauthorized" });
+        // }
 
-        const { data: brandData, error } = await supabase
+        console.log(req.user?.id);
+        const { data, error } = await supabase
             .from("brand_data")
             .select("*")
-            .eq("userId", userId);
+        // .eq("userId", userId);
+        // console.log("Brand Data: ", brandData);
 
         if (error) throw error;
 
-        if (!brandData || brandData.length === 0) {
+        if (!data || data.length === 0) {
             return res.status(404).json({ message: "No brand data found" });
         }
 
-        return res.status(200).json({ data: brandData });
+        return res.status(200).json({ data });
     } catch (error) {
         console.error("getAllBrandData error:", error);
         return res.status(500).json({ error: "Internal server error" });
