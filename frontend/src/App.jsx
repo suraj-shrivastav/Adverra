@@ -1,20 +1,26 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { useEffect } from "react";
-import { useAuthStore } from "./store/useAuthStore";
 
 import LandingPage from "./pages/LandingPage";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ImageGeneration from "./pages/ImageGeneration";
-import ProtectedRoute from "./ProtectedRoute";
-import PublicRoute from "./PublicRoute";
+import { useAuth } from "./context/AuthContext";
+
+const ProtectedRoute = ({ children }) => {
+  const { user, session } = useAuth();
+  // console.log(user);
+  if (!user) {
+    return <Navigate to="/login" />;
+  }
+  useEffect(() => {
+    // console.log(session);
+  }, [session])
+  return children;
+};
 
 const App = () => {
-  const checkAuth = useAuthStore((state) => state.checkAuth);
-
-  useEffect(() => {
-    checkAuth();
-  }, [checkAuth]);
+  const { user } = useAuth();
 
   return (
     <Routes>
@@ -28,23 +34,8 @@ const App = () => {
         }
       />
 
-      {/* Public only */}
-      <Route
-        path="/login"
-        element={
-          <PublicRoute>
-            <Login />
-          </PublicRoute>
-        }
-      />
-      <Route
-        path="/signup"
-        element={
-          <PublicRoute>
-            <Signup />
-          </PublicRoute>
-        }
-      />
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
 
       <Route path="/landing" element={<LandingPage />} />
     </Routes>

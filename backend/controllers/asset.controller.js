@@ -1,332 +1,215 @@
 import genAI from "../config/gemini.js";
 import assetPrompts from "../utils/assets.prompts.js";
+import imagePrompts from "../utils/prompts.js";
 import { uploadBase64Image } from "../config/cloudinary.js";
-import { imageUrlToBase64 } from "../utils/imageUrlToBase64.js";
+import { uploadUrlImageToGemini } from "../utils/uploadUrlImageToGemini.js";
 import { uploadImageToGemini } from "../utils/uploadImage.js";
 import { supabase } from "../config/supabase.js";
-import fs from "fs";
+import fs from "fs/promises";
 
+const buildPrompt = ({ designType, text, brand }) => {
+    const style = imagePrompts[designType] || imagePrompts.retro_cel_shaded_prompt;
 
-const constructBrandPrompt = (brandData) => {
-    if (!brandData) return "";
-
-    const colors = brandData.colors
-        ? brandData.colors.map((c) => `${c.name} (${c.hex})`).join(", ")
-        : "Brand colors";
-
-    const industry = brandData.industries?.eic
-        ? brandData.industries.eic
-            .map((i) => i.subindustry || i.industry)
-            .join(", ")
-        : "Technology";
-
-    return `
-[Brand Identity]:
-- Name: ${brandData.title || "Brand"}
-- Industry: ${industry}
-- Primary Colors: ${colors}
-- Brand Voice/Tone: ${brandData.slogan || "Professional, Trustworthy"}
-- Context: ${brandData.description || ""}
-    `.trim();
-};
-
-const buildRawImagePrompt = ({ designType, prompt, brandData }) => {
-    const selectedStyle =
-        assetPrompts[designType] || assetPrompts["bold_dark_grooming_prompt"];
-    const brandContextBlock = constructBrandPrompt(brandData);
-
-    return `
-[Design Style]: ${selectedStyle}
-
-[Brand Data Context]:${brandContextBlock}
-
-[Subject]: ${prompt}
-
-[Quality Guidelines]:
-- Professional marketing asset, award-winning composition.
-- 8k resolution, highly detailed, sharp focus.
-- Perfect lighting and color grading matching the Brand Identity colors.
-    `.trim();
-};
-
-// const generatePrompt = async (rawPrompt) => {
-//     try {
-//         const response = await genAI.models.generateContent({
-//             model: "gemini-3-flash-preview",
-//             config: {
-//                 responseMimeType: "application/json",
-//                 responseSchema: {
-//                     type: "OBJECT",
-//                     properties: {
-//                         prompt: { type: "STRING" },
-//                     },
-//                 },
-//             },
-//             systemInstruction: {
-//                 parts: [
-//                     {
-//                         text: `You are an expert Brand Marketing Strategist.
-// Write ONE high-quality image generation prompt based on the provided context.
-
-// Output strictly in JSON:
-// { "prompt": "Your detailed image description here..." }`,
-//                     },
-//                 ],
-//             },
-//             contents: [
-//                 {
-//                     role: "user",
-//                     parts: [{ text: `[Brand Data Context]:\n${rawPrompt}` }],
-//                 },
-//             ],
-//         });
-
-//         const responseText =
-//             response.candidates?.[0]?.content?.parts?.[0]?.text;
-
-//         if (!responseText) throw new Error("Empty response from AI");
-
-//         return JSON.parse(responseText).prompt;
-//     } catch (error) {
-//         console.error("Error optimizing prompt:", error);
-//         return null;
-//     }
-// };
-
-
-const buildImageParts = async ({ referenceImages, optimizedPrompt }) => {
-    try {
-        const parts = [];
-        if (referenceImages && Array.isArray(referenceImages)) {
-            for (const file of referenceImages) {
-                // If file is an object with uri and mimeType
-                if (file.uri && file.mimeType) {
-                    parts.push({
-                        fileData: {
-                            fileUri: file.uri,
-                            mimeType: file?.mimeType,
-                        },
-                    });
-                } else if (typeof file === "string") {
-                    // Fallback if it's just a URI string
-                    parts.push({
-                        fileData: {
-                            fileUri: file,
-                            // mimeType: "image/png", // Default mimeType
-                        },
-                    });
-                }
-            }
-        }
-
-        if (optimizedPrompt) {
-            parts.push({ text: optimizedPrompt });
-        }
-        return parts;
-    } catch (error) {
-        console.error("Error in buildImageParts:", error);
-        throw error;
+    if (!brand) {
+        return `${style}\n\n${text}`;
     }
+
+    const colors = brand.colors?.map(c => `${c.name} (${c.hex})`).join(", ");
+    const industry =
+        brand.industries?.eic?.map(i => i.subindustry || i.industry).join(", ") ||
+        "Technology";
+
+    return `
+[Design Style]
+${style}
+
+[Brand Identity]
+Name: ${brand.title}
+Industry: ${industry}
+Colors: ${colors || "Brand aligned"}
+Voice: ${brand.slogan || "Professional"}
+
+[Creative Brief]
+${text}
+
+[Rules]
+No text, no logos, no watermarks.
+High-quality, realistic, professional.
+`.trim();
 };
 
-// const buildImageParts = async ({ optimizedPrompt, referenceImages }) => {
-//     const parts = [];
-
-//     if (referenceImages && Array.isArray(referenceImages)) {
-//         for (const item of referenceImages) {
-//             if (typeof item === 'string') {
-//                 if (item.includes("generativelanguage.googleapis.com")) {
-//                     // It's a Gemini File API URI
-//                     parts.push({
-//                         fileData: {
-//                             fileUri: item,
-//                             mimeType: "image/jpeg", // We might want to pass this or detect it, usually jpeg/png
-//                         }
-//                     });
-//                 } else {
-//                     // It's a standard URL
-//                     const referenceImage = await imageUrlToBase64(item);
-//                     parts.push({
-//                         inlineData: {
-//                             data: referenceImage.data,
-//                             mimeType: referenceImage.mimeType,
-//                         },
-//                     });
-//                 }
-//             } else if (item.uri && item.mimeType) {
-//                 // It's an object with uri and mimeType (from our new upload endpoint)
-//                 parts.push({
-//                     fileData: {
-//                         fileUri: item.uri,
-//                         mimeType: item.mimeType,
-//                     }
-//                 });
-//             }
-//         }
-//     }
-
-//     parts.push({ text: optimizedPrompt });
-
-//     return parts;
-// };
-
+const buildImageParts = (images, prompt) => [
+    ...(images || []).map(img => ({
+        fileData: { fileUri: img.uri, mimeType: img.mimeType },
+    })),
+    { text: prompt },
+];
 
 export const generateImage = async (req, res) => {
     try {
-        const { designType, prompt, brandData, referenceImages } = req.body;
-        const start = Date.now();
+        if (!req.user?.id) {
+            return res.status(401).json({ success: false, message: "Unauthorized" });
+        }
 
-        const rawPrompt = buildRawImagePrompt({
+        const {
             designType,
             prompt,
+            additionalContext,
             brandData,
+            referenceImages = [],
+            brandLogos = [],
+            aspectRatio = "1:1",
+        } = req.body;
+
+        const text = additionalContext || prompt;
+        if (!text) {
+            return res.status(400).json({ success: false, message: "Prompt required" });
+        }
+
+        // Process logos concurrently
+        const processedLogos = await Promise.all(
+            brandLogos.slice(0, 2).map(async (logo) => {
+                if (!logo?.url) return null;
+                try {
+                    const file = await uploadUrlImageToGemini(logo.url);
+                    return { uri: file.uri, mimeType: file.mimeType };
+                } catch (e) {
+                    console.error("Logo upload failed:", e);
+                    return null;
+                }
+            })
+        );
+
+
+        // merge references (max 4)
+        const refs = [
+            ...referenceImages,
+            ...processedLogos.filter(Boolean)
+        ].slice(0, 4);
+
+        const finalPrompt = buildPrompt({
+            designType,
+            text,
+            brand: brandData,
         });
-
-        // const optimizedPrompt = await generatePrompt(rawPrompt);
-        const optimizedPrompt = rawPrompt;
-
-        // console.log("Image Parts: ", referenceImages);
-        // console.log("Final Prompt Sent to Model:", optimizedPrompt);
-
-        const imgParts = await buildImageParts({ referenceImages, optimizedPrompt });
-
-        console.log("Image Parts: ", imgParts);
-
-        const systemInstruction = `
-You are an expert brand marketing strategist and designer. Your goal is to create High Quality Marketing Assets for Brands.
-DO NOT generate text, watermarks, or logos inside the image.
-DO NOT include blurry or distorted elements.
-Ensure the image is strictly safe for work and follows brand safety guidelines.
-        `;
-
-        console.log("Image Generation started.");
 
         const response = await genAI.models.generateContent({
             model: "gemini-3-pro-image-preview",
-            contents: { role: "user", parts: imgParts },
-            systemInstruction: systemInstruction,
+            contents: {
+                role: "user",
+                parts: buildImageParts(refs, finalPrompt),
+            },
             config: {
                 imageConfig: {
-                    aspectRatio: '16:9',
-                    resolution: '2K',
+                    aspectRatio,
+                    resolution: "2K",
                 },
-                tools: [{ googleSearch: {} }],
-            }
+            },
         });
 
-        const parts = response.candidates?.[0]?.content?.parts || [];
-        const imagePart = parts.find((p) =>
-            p.inlineData?.mimeType?.startsWith("image/")
+        const image = response?.candidates?.[0]?.content?.parts?.find(
+            p => p.inlineData?.mimeType?.startsWith("image/")
         );
 
-        if (!imagePart) {
-            return res.status(400).json({
-                success: false,
-                message: "No image returned from Gemini",
-            });
+        if (!image) {
+            return res.status(400).json({ success: false, message: "No image generated" });
         }
 
-        const base64Image = imagePart.inlineData.data;
-        const mimeType = imagePart.inlineData.mimeType;
+        const uploaded = await uploadBase64Image(
+            image.inlineData.data,
+            image.inlineData.mimeType
+        );
 
-        const uploadedImage = await uploadBase64Image(base64Image, mimeType);
+        await supabase.from("brand_assets").insert({
+            userId: req.user.id,
+            img_url: uploaded.secure_url,
+            img_meta_data: {
+                publicId: uploaded.public_id,
+                width: uploaded.width,
+                height: uploaded.height,
+                format: uploaded.format,
+            },
+        });
 
-        const timeTaken = (Date.now() - start) / 1000;
-        console.log(`Image Generated in: ${timeTaken} seconds`)
-
-        const { data, error } = await supabase
-            .from("brand_assets")
-            .insert({
-                userId: req.user?.id || "736ec2b1-9ba6-4ee9-9854-b23cd21d0061",
-                img_url: uploadedImage.secure_url,
-                img_meta_data: {
-                    publicId: uploadedImage.public_id,
-                    width: uploadedImage.width,
-                    height: uploadedImage.height,
-                    format: uploadedImage.format,
-                }
-            })
-        if (error) throw error;
-        console.log("data: ", {
-            imageUrl: uploadedImage.secure_url,
-            publicId: uploadedImage.public_id,
-            width: uploadedImage.width,
-            height: uploadedImage.height,
-            format: uploadedImage.format,
-            timeTaken: `Image Generated in ${timeTaken} seconds`,
+        console.log("uploaded", {
+            success: true,
+            imageUrl: uploaded.secure_url,
+            // meta: uploaded,
         });
         return res.status(200).json({
             success: true,
-            imageUrl: uploadedImage.secure_url,
-            publicId: uploadedImage.public_id,
-            width: uploadedImage.width,
-            height: uploadedImage.height,
-            format: uploadedImage.format,
-            timeTaken: `Image Generated in ${timeTaken} seconds`,
+            imageUrl: uploaded.secure_url,
+            meta: uploaded,
         });
-    } catch (error) {
-        console.error("generateImage error:", error);
-        return res.status(500).json({
-            success: false,
-            message: error.message,
-        });
+    } catch (err) {
+        console.error("generateImage:", err);
+        return res.status(500).json({ success: false, message: "Generation failed" });
     }
 };
-
-
-export const getAssets = async (req, res) => {
-    try {
-        const userId = req.user?.id;
-
-        if (!userId) {
-            return res.status(401).json({ error: "Unauthorized" });
-        }
-
-        const { data, error } = await supabase
-            .from("brand_assets")
-            .select("img_url")
-            .eq("userId", userId);
-        if (error) throw error;
-
-        return res.status(200).json({ success: true, data: data });
-    } catch (error) {
-        console.error("Error at getAssets: ", error.message);
-        return res.status(500).json({ success: false, message: "Internal Server Error" });
-    }
-}
 
 export const uploadReferenceImage = async (req, res) => {
     try {
-        const { file } = req;
-        console.log(file);
-        const geminiFile = await uploadImageToGemini(file.path, file.mimetype, file.originalname);
+        if (!req.file) {
+            return res.status(400).json({ success: false, message: "No file" });
+        }
+
+        const file = await uploadImageToGemini(
+            req.file.path,
+            req.file.mimetype,
+            req.file.originalname
+        );
+
+        await fs.unlink(req.file.path);
+
         return res.status(200).json({
             success: true,
-            message: "File uploaded to Gemini successfully",
             file: {
-                uri: geminiFile.uri,
-                name: geminiFile.name,
-                mimeType: geminiFile.mimeType,
-            }
+                uri: file.uri,
+                mimeType: file.mimeType,
+                name: file.name,
+            },
         });
-    } catch (error) {
-
+    } catch (err) {
+        console.error("uploadReferenceImage:", err);
+        return res.status(500).json({ success: false });
     }
 };
+
+export const getAssets = async (req, res) => {
+    try {
+        if (!req.user?.id) {
+            return res.status(401).json({ success: false });
+        }
+
+        const { data, error } = await supabase
+            .from("brand_assets")
+            .select("id, img_url, img_meta_data, created_at")
+            .eq("userId", req.user.id)
+            .order("created_at", { ascending: false });
+
+        if (error) throw error;
+
+        return res.status(200).json({ success: true, data });
+    } catch (err) {
+        console.error("getAssets:", err);
+        return res.status(500).json({ success: false });
+    }
+};
+
 
 export const deleteAssets = async (req, res) => {
     try {
         const { ids } = req.body;
-        for (const id of ids) {
-            const { data, error } = await supabase
-                .from("brand_assets")
-                .delete()
-                .eq("id", id);
-            if (error) throw error;
+
+        if (!Array.isArray(ids) || !ids.length) {
+            return res.status(400).json({ success: false });
         }
-        return res.status(200).json({ success: true, message: "Assets deleted successfully" });
-    } catch (error) {
-        console.error("Error at deleteAssets: ", error.message);
-        return res.status(500).json({ success: false, message: "Internal Server Error" });
+
+        await supabase.from("brand_assets").delete().in("id", ids);
+
+        return res.status(200).json({ success: true });
+    } catch (err) {
+        console.error("deleteAssets:", err);
+        return res.status(500).json({ success: false });
     }
-}
+};

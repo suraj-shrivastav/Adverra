@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, Loader2 } from 'lucide-react';
 import PlatformSelector from './PlatformSelector';
 import ReferenceUploader from './ReferenceUploader';
 import VisualToneGrid from './VisualToneGrid'; // See snippet below
@@ -10,6 +10,7 @@ const GenerationControls = ({
     setFormData,
     visualTones,
     isLoadingData,
+    isGenerating,
     handlers
 }) => {
 
@@ -28,19 +29,19 @@ const GenerationControls = ({
                             className="w-full h-24 bg-[#111] border border-gray-800 rounded-2xl p-4 text-gray-200 placeholder-gray-600 focus:border-blue-600 outline-none transition-all resize-none"
                             placeholder="Describe specific details..."
                             value={formData.additionalContext}
-                            onChange={(e) => setFormData(prev => ({ ...prev, additionalContext: e.target.value }))}
+                            onChange={(e) => setFormData({ additionalContext: e.target.value })}
                         />
                     </div>
 
                     <div className="grid grid-cols-2 gap-6">
                         <PlatformSelector
                             platform={formData.platform}
-                            setPlatform={(val) => setFormData(prev => ({ ...prev, platform: val }))}
+                            setPlatform={(val) => setFormData({ platform: val })}
                         />
                         {/* Simple Aspect Ratio Button Group Logic can go here or be its own component */}
                         <AspectRatioSelector
                             value={formData.aspectRatio}
-                            onChange={(val) => setFormData(prev => ({ ...prev, aspectRatio: val }))}
+                            onChange={(val) => setFormData({ aspectRatio: val })}
                         />
                     </div>
 
@@ -52,7 +53,7 @@ const GenerationControls = ({
                                 className="w-full bg-[#111] border border-gray-800 rounded-2xl px-4 py-3 text-gray-200 focus:border-blue-600 outline-none"
                                 placeholder="e.g. GenZ"
                                 value={formData.targetAudience}
-                                onChange={(e) => setFormData(prev => ({ ...prev, targetAudience: e.target.value }))}
+                                onChange={(e) => setFormData({ targetAudience: e.target.value })}
                             />
                         </div>
                         <div className="space-y-3">
@@ -62,7 +63,7 @@ const GenerationControls = ({
                                 className="w-full bg-[#111] border border-gray-800 rounded-2xl px-4 py-3 text-gray-200 focus:border-blue-600 outline-none"
                                 placeholder="e.g. Join the Beta"
                                 value={formData.textOverlay}
-                                onChange={(e) => setFormData(prev => ({ ...prev, textOverlay: e.target.value }))}
+                                onChange={(e) => setFormData({ textOverlay: e.target.value })}
                             />
                         </div>
                     </div>
@@ -76,7 +77,7 @@ const GenerationControls = ({
                     <VisualToneGrid
                         tones={visualTones}
                         selectedToneId={formData.selectedToneId}
-                        onSelect={(id) => setFormData(prev => ({ ...prev, selectedToneId: id }))}
+                        onSelect={(id) => setFormData({ selectedToneId: id })}
                         isLoading={isLoadingData}
                     />
                 </div>
@@ -88,9 +89,22 @@ const GenerationControls = ({
                     <span className="text-[10px] uppercase tracking-wider text-gray-500 font-bold">Estimated Cost</span>
                     <span className="text-white font-medium">12 Credits</span>
                 </div>
-                <button onClick={() => handlers.onGenerate(formData)} className="flex items-center gap-2 bg-white hover:bg-gray-200 text-black px-8 py-3 rounded-full font-bold transition-all shadow-lg shadow-white/5 active:scale-95">
-                    <Sparkles size={18} className="fill-black" />
-                    <span>Generate Image</span>
+                <button
+                    onClick={() => handlers.onGenerate(formData)}
+                    disabled={isGenerating}
+                    className={`flex items-center gap-2 bg-white hover:bg-gray-200 text-black px-8 py-3 rounded-full font-bold transition-all shadow-lg shadow-white/5 active:scale-95 ${isGenerating ? 'opacity-70 cursor-wait' : ''}`}
+                >
+                    {isGenerating ? (
+                        <>
+                            <Loader2 size={18} className="animate-spin text-black" />
+                            <span>Generating...</span>
+                        </>
+                    ) : (
+                        <>
+                            <Sparkles size={18} className="fill-black" />
+                            <span>Generate Image</span>
+                        </>
+                    )}
                 </button>
 
             </div>

@@ -1,14 +1,33 @@
 import React from 'react';
-import { ChevronDown } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { ChevronDown, LogOut } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 import BrandCard from './BrandCard';
 
 const BrandSidebar = ({ brands, selectedBrandId, onBrandChange, selectedBrandData }) => {
-    console.log("brands in sidebar: ", brands);
+    const { logout } = useAuth();
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        logout();
+        navigate('/login');
+    };
+
     return (
         <div className="w-[420px] border-r border-gray-900 flex flex-col p-8 gap-6 shrink-0 h-full overflow-y-auto custom-scrollbar">
-            <div className="space-y-1">
-                <h1 className="text-2xl font-semibold text-white tracking-tight">Image Generation</h1>
-                <p className="text-sm text-gray-500">Manage brand context and generate assets</p>
+            <div className="flex items-start justify-between">
+                <div className="space-y-1">
+                    <h1 className="text-2xl font-semibold text-white tracking-tight">Image Generation</h1>
+                    <p className="text-sm text-gray-500">Manage brand context and generate assets</p>
+                </div>
+                <button
+                    onClick={handleLogout}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-gray-400 text-sm font-medium hover:bg-white/10 hover:text-white hover:border-white/20 transition-all"
+                    title="Logout"
+                >
+                    <LogOut size={14} />
+                    <span>Logout</span>
+                </button>
             </div>
 
             <div className="space-y-2.5">

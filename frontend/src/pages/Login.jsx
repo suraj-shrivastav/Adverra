@@ -1,129 +1,93 @@
-import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
-import { useAuthStore } from "../store/useAuthStore";
+import { useState, useEffect } from "react";
+import { useAuth } from "../context/AuthContext.jsx";
+import { useNavigate, Link } from "react-router-dom";
 
 const Login = () => {
-    const navigate = useNavigate();
-    const login = useAuthStore((s) => s.login);
-
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(false);
+    const { signIn, session } = useAuth();
+    const navigate = useNavigate();
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError(null);
-        setLoading(true);
-
-        try {
-            await login({ email, password });
+    useEffect(() => {
+        if (session) {
             navigate("/");
-        } catch (err) {
-            setError(err.message || "Login failed");
-        } finally {
-            setLoading(false);
+        }
+    }, [session, navigate]);
+
+    const handleLogin = async (e) => {
+        e.preventDefault();
+        const { error } = await signIn({ email, password });
+        if (error) {
+            alert(error.message);
+        } else {
+            navigate("/");
         }
     };
 
     return (
-        <div className="min-h-screen w-full bg-black text-white flex items-center justify-center px-6">
-            <div
-                className="
-          w-full max-w-md
-          rounded-2xl
-          border border-white/15
-          backdrop-blur-xl
-          p-6 sm:p-8
-        "
-            >
-                {/* Header */}
-                <h1 className="text-2xl sm:text-3xl font-semibold text-white/90 text-center">
-                    Welcome back
-                </h1>
+        <div className="min-h-screen flex items-center justify-center bg-background px-4 transition-colors duration-500">
+            <div className="w-full max-w-md rounded-2xl border border-border/50 bg-muted/40 backdrop-blur p-8 shadow-xl">
 
-                <p className="mt-2 text-sm sm:text-base text-white/55 text-center">
-                    Log in to your MarketIt account
-                </p>
+                {/* Header */}
+                <div className="mb-6">
+                    <h1 className="text-2xl font-bold text-foreground tracking-tight">
+                        Welcome back
+                    </h1>
+                    <p className="text-sm text-muted-foreground mt-1">
+                        Continue finding the perfect investor match.
+                    </p>
+                </div>
 
                 {/* Form */}
-                <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+                <form onSubmit={handleLogin} className="space-y-5">
                     <div>
-                        <label className="block text-sm text-white/65 mb-2">
+                        <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                             Email
                         </label>
                         <input
                             type="email"
+                            placeholder="you@startup.com"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            placeholder="you@example.com"
                             required
-                            className="
-                w-full rounded-lg
-                border border-white/15
-                bg-transparent
-                px-4 py-3 sm:py-3.5
-                text-white
-                placeholder-white/30
-                focus:outline-none focus:border-white/40
-              "
+                            className="mt-2 w-full rounded-lg bg-muted border border-border/50
+                         px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/50
+                         focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
                         />
                     </div>
 
                     <div>
-                        <label className="block text-sm text-white/65 mb-2">
+                        <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                             Password
                         </label>
                         <input
                             type="password"
+                            placeholder="••••••••"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            placeholder="••••••••"
                             required
-                            className="
-                w-full rounded-lg
-                border border-white/15
-                bg-transparent
-                px-4 py-3 sm:py-3.5
-                text-white
-                placeholder-white/30
-                focus:outline-none focus:border-white/40
-              "
+                            className="mt-2 w-full rounded-lg bg-muted border border-border/50
+                         px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/50
+                         focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
                         />
                     </div>
 
-                    {/* Error */}
-                    {error && (
-                        <p className="text-sm text-red-400">
-                            {error}
-                        </p>
-                    )}
-
+                    {/* Primary CTA */}
                     <button
                         type="submit"
-                        disabled={loading}
-                        className="
-              w-full rounded-xl
-              bg-white
-              py-3.5
-              text-base sm:text-lg
-              font-medium
-              text-black
-              hover:bg-gray-200
-              transition
-              disabled:opacity-60
-            "
+                        className="w-full rounded-lg bg-primary py-2.5 text-sm font-semibold text-white
+                       hover:bg-primary/90 transition"
                     >
-                        {loading ? "Logging in…" : "Log in"}
+                        Log In
                     </button>
                 </form>
 
                 {/* Footer */}
-                <p className="mt-6 text-sm sm:text-base text-white/45 text-center">
+                <p className="mt-6 text-center text-sm text-muted-foreground">
                     Don’t have an account?{" "}
                     <Link
                         to="/signup"
-                        className="text-white/80 hover:text-white underline underline-offset-4"
+                        className="text-primary hover:text-primary/80 font-medium"
                     >
                         Sign up
                     </Link>

@@ -1,6 +1,5 @@
 import { create } from 'zustand';
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { api } from '../libs/api.js';
 
 export const useDataStore = create((set) => ({
     brands: [],
@@ -9,16 +8,9 @@ export const useDataStore = create((set) => ({
 
     getAllBrands: async () => {
         try {
-            const res = await fetch(`${API_URL}/brands`, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
-                },
-            });
+            // api interceptor returns response.data directly
+            const data = await api.get("/brands");
 
-            if (!res.ok) throw new Error('Failed to fetch brands');
-
-            const data = await res.json();
             set({
                 brands: data.data.map(item => ({
                     ...item.brand,
@@ -36,40 +28,29 @@ export const useDataStore = create((set) => ({
 
     getAllCampaigns: async () => {
         try {
-            const res = await fetch(`${API_URL}/campaigns`);
-            if (!res.ok) throw new Error();
-            const data = await res.json();
+            const data = await api.get("/campaigns");
             set({ campaigns: data ?? [] });
         } catch (error) {
-            console.error(error);
+            console.error('getAllCampaigns error:', error);
         }
     },
 
     getAllAssets: async () => {
         try {
-            const res = await fetch(`${API_URL}/assets`);
-            if (!res.ok) throw new Error();
-            const data = await res.json();
+            const data = await api.get("/assets");
             set({ assets: data ?? [] });
         } catch (error) {
-            console.error(error);
+            console.error('getAllAssets error:', error);
         }
     },
 
-    handleAssetsGeneration: async (fromData) => {
-        console.log("handleAssetsGeneration: ", fromData);
+    handleAssetsGeneration: async (formData) => {
         try {
-            const res = await fetch(`${API_URL}/assets/generate`, {
-                method: "POST",
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
-                },
-                data: fromData
-            })
-            console.log(res);
+            const data = await api.post("/assets/generate", formData);
+            return data;
         } catch (error) {
-            console.error(error);
+            console.error('handleAssetsGeneration error:', error);
+            throw error;
         }
     }
 }));

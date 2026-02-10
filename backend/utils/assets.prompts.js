@@ -1,7 +1,8 @@
 const hand_drawn_prompt = `
 Create a hand-drawn quirky illustration on a solid black background with a playful, expressive, slightly surreal aesthetic. The artwork should feel clever, character-driven, and imperfect, as if sketched by hand with confidence and humor. Drawing Style: Hand-drawn ink or marker illustration, Imperfect, organic linework with visible human strokes, Slight wobble and variation in line thickness, No vector precision, no digital cleanliness, Sketchbook or zine-style energy. Quirk and Character: Exaggerated but restrained proportions, Expressive faces, awkward poses, or odd details, Humor comes from subtle visual irony, Characters or objects feel thoughtful, confused, amused, or quietly weird, Avoid slapstick or childish cartoon tropes. Color Palette: Black background is dominant and untouched, Limited, high-contrast colors only, Accent colors: off-white, muted yellow, dull pink, teal, light blue, soft orange, Use color sparingly to create focal points, No gradients or neon effects. Texture and Fill: Flat fills with occasional rough shading, Dry-brush, crayon, or chalk-like texture allowed, White ink or muted color strokes pop against black, Visible grain or paper-like texture encouraged. Composition: Central subject with generous negative space, Strong silhouette readability, Slight asymmetry for visual interest, Poster or editorial-style framing. Mood and Tone: Quirky, clever, and slightly introspective, Calm humor, not chaos, Feels like indie illustration or editorial art, Contemporary, expressive, and human. Rendering Rules: No photorealism, No 3D rendering, No cinematic lighting, No glossy or polished effects, Maintain a flat, hand-crafted look, High resolution with visible line texture.
 `
-
+const hand_drawn_2_prompt = `
+Create a hand-drawn quirky illustration on a warm off-white, sketchbook-style background with subtle paper texture. The drawing should feature a slightly awkward, expressive character with asymmetrical features and playful imperfections, rendered in loose, wobbling ink lines of varying thickness. Use a limited, muted color palette—dusty blue, mustard yellow, faded coral, moss green, and charcoal black—with flat, uneven fills and visible strokes that occasionally spill outside the lines. Incorporate small humorous details like floating doodles or handwritten notes to add personality and charm. The composition should feel gently off-balance and spontaneous, with plenty of negative space. The overall mood is whimsical, cozy, and quietly funny. Avoid photorealism, gradients, or digital cleanliness—embrace imperfection, texture, and a distinctly handmade, indie illustration feel.`
 const saas_glass_prompt = `
 Create a sophisticated, isometric 3D composition with a 'Calm Tech' aesthetic. The visual language should communicate clarity, depth, and invisible complexity made simple. Material and Texture: The primary elements should be rendered in translucent frosted glass and matte ceramic to imply transparency and modernity. Use subsurface scattering to catch light within the glass volumes. Incorporate glowing edge details and thin, luminous data lines to represent connectivity. Composition: Gravity-free, floating arrangement with a balanced, clean layout. Use isometric or orthographic projection to provide a 'god's eye view' of the system. A soft, volumetric fog should occupy the negative space to add depth without clutter. Color and Mood: Deep, serene color fields using 'Transformative Teal' and cool ocean tones to signal eco-consciousness and resilience. The atmosphere must be orderly and professional. Lighting: Soft studio lighting with cool tones. Use subtle rim lighting to define the silhouettes of the glass edges against the background. Rendering Rules: Octane render style, raytracing enabled, high fidelity, sharp focus on the core object with gentle depth of field blur in the background. No organic chaos, no grime, no graffiti, no jagged edges, no text overlays, no low-resolution textures, no aggressive high-contrast shadows.
 `
@@ -755,37 +756,38 @@ Negative Prompt: chaos, dark aggression, neon colors, hand-crafted texture, play
 
 
 const assetPrompts = {
-    hand_drawn_prompt,
-    saas_glass_prompt,
-    three_d_prompt,
-    moody_prompt,
-    dark_3d_prompt,
-    genZ_prompt,
-    kids_prompt,
-    kids_fomo_prompt, // Creepy prompt :|
-    candid_joy_flash_prompt,
-    internet_native_tasteful_prompt,
-    future_ready_prompt,
-    quiet_confidence_prompt,
-    premium_minimal_prompt,
-    calm_problem_solving_prompt,
-    momentum_growth_prompt,
-    screenshot_worthy_prompt,
-    fashion_identity_editorial_prompt,
-    food_craft_authentic_prompt,
-    fashion_drop_culture_prompt,
-    fashion_aspirational_minimal_prompt,
-    bold_dark_grooming_prompt,
-    loose_ink_sketch,
-    impasto_oil_paint,
-    risograph_print_style,
-    charcoal_sketch_raw,
-    alcohol_ink_fluid,
-    kinetic_glass_motion,
-    lofi_risograph_bg,
-    cinematic_film_look,
-    fintech_trust_prompt,
-    fintech_trust_branding,
+        hand_drawn_prompt,
+        saas_glass_prompt,
+        three_d_prompt,
+        moody_prompt,
+        dark_3d_prompt,
+        genZ_prompt,
+        kids_prompt,
+        kids_fomo_prompt, // Creepy prompt :|
+        candid_joy_flash_prompt,
+        internet_native_tasteful_prompt,
+        future_ready_prompt,
+        quiet_confidence_prompt,
+        premium_minimal_prompt,
+        calm_problem_solving_prompt,
+        momentum_growth_prompt,
+        screenshot_worthy_prompt,
+        fashion_identity_editorial_prompt,
+        food_craft_authentic_prompt,
+        fashion_drop_culture_prompt,
+        fashion_aspirational_minimal_prompt,
+        bold_dark_grooming_prompt,
+        loose_ink_sketch,
+        impasto_oil_paint,
+        risograph_print_style,
+        charcoal_sketch_raw,
+        alcohol_ink_fluid,
+        kinetic_glass_motion,
+        lofi_risograph_bg,
+        cinematic_film_look,
+        fintech_trust_prompt,
+        fintech_trust_branding,
+        hand_drawn_2_prompt,
 
 
 };

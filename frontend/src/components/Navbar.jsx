@@ -1,6 +1,16 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { LogOut } from "lucide-react";
 
 const Navbar = () => {
+    const { user, logout } = useAuth();
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        logout();
+        navigate("/login");
+    };
+
     return (
         <div className="absolute top-6 left-1/2 -translate-x-1/2 z-50">
             <div
@@ -35,29 +45,54 @@ const Navbar = () => {
                         Assets
                     </Link>
 
-                    <Link
-                        to="/login"
-                        className="hover:text-white transition-colors duration-200"
-                    >
-                        Login
-                    </Link>
+                    {user ? (
+                        <button
+                            onClick={handleLogout}
+                            className="
+                                flex items-center gap-2
+                                rounded-full
+                                bg-white/10
+                                border border-white/20
+                                px-4 sm:px-6
+                                py-1.5 sm:py-2
+                                text-sm sm:text-base
+                                text-white
+                                font-medium
+                                transition
+                                hover:bg-white/20
+                                hover:border-white/40
+                            "
+                        >
+                            <LogOut size={16} />
+                            Logout
+                        </button>
+                    ) : (
+                        <>
+                            <Link
+                                to="/login"
+                                className="hover:text-white transition-colors duration-200"
+                            >
+                                Login
+                            </Link>
 
-                    <Link
-                        to="/signup"
-                        className="
-              rounded-full
-              bg-white
-              px-4 sm:px-6
-              py-1.5 sm:py-2
-              text-sm sm:text-base md:text-lg
-              text-black
-              font-semibold
-              transition
-              hover:bg-gray-200
-            "
-                    >
-                        Sign up
-                    </Link>
+                            <Link
+                                to="/signup"
+                                className="
+                                    rounded-full
+                                    bg-white
+                                    px-4 sm:px-6
+                                    py-1.5 sm:py-2
+                                    text-sm sm:text-base md:text-lg
+                                    text-black
+                                    font-semibold
+                                    transition
+                                    hover:bg-gray-200
+                                "
+                            >
+                                Sign up
+                            </Link>
+                        </>
+                    )}
                 </div>
             </div>
         </div>

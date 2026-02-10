@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plus, X } from 'lucide-react';
+import { Plus, X, Loader2, AlertCircle } from 'lucide-react';
 
 const ReferenceUploader = ({ uploadedImages, onUpload, onRemove }) => {
     return (
@@ -28,6 +28,26 @@ const ReferenceUploader = ({ uploadedImages, onUpload, onRemove }) => {
                 {uploadedImages.map((img) => (
                     <div key={img.id} className="relative w-24 h-24 rounded-xl overflow-hidden group border border-gray-800 animate-in fade-in zoom-in duration-200">
                         <img src={img.url} alt="preview" className="w-full h-full object-cover" />
+
+                        {/* Upload status overlay */}
+                        {img.isUploading && (
+                            <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                                <Loader2 size={20} className="animate-spin text-white" />
+                            </div>
+                        )}
+
+                        {/* Error indicator */}
+                        {img.uploadError && (
+                            <div className="absolute inset-0 bg-red-900/60 flex items-center justify-center">
+                                <AlertCircle size={20} className="text-red-300" />
+                            </div>
+                        )}
+
+                        {/* Success indicator (green border) */}
+                        {img.geminiFile && !img.isUploading && (
+                            <div className="absolute inset-0 border-2 border-green-500 rounded-xl pointer-events-none" />
+                        )}
+
                         <button
                             onClick={() => onRemove(img.id)}
                             className="absolute top-1 right-1 bg-black/70 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500/80"
