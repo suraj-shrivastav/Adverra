@@ -26,12 +26,16 @@ export const useImageGenerationStore = create((set, get) => ({
     // STATIC CONFIG
     // ======================
     visualTones: [
-        { id: "modern-minimal", name: "Modern Minimal", description: "Clean lines, ample whitespace." },
-        { id: "vibrant-energetic", name: "Vibrant & Energetic", description: "Bold colors, dynamic compositions." },
-        { id: "warm-organic", name: "Warm & Organic", description: "Earth tones, natural textures." },
-        { id: "tech-futuristic", name: "Tech / Futuristic", description: "Neon accents, cyber aesthetics." },
-        { id: "corporate-professional", name: "Corporate Professional", description: "Structured layouts, clean typography." },
-        { id: "luxury-premium", name: "Luxury / Premium", description: "High contrast, elegant styling." },
+        // { id: "minimalist_pro_prompt", name: "Minimalist Pro" },
+        // { id: "neo_minimalist_prompt", name: "Neo Minimalist" },
+        { id: "risograph_vintage_prompt", name: "Risograph Vintage" },
+        { id: "claymorphism_prompt", name: "Claymorphism" },
+        { id: "luxury_noir_prompt", name: "Luxury Noir" },
+        { id: "cyber_organic_prompt", name: "Cyber Organic" },
+        { id: "hand_drawn_prompt", name: "Hand Drawn" },
+        { id: "hand_drawn_2_prompt", name: "Hand Drawn 2" },
+        { id: "three_d_prompt", name: "3D" },
+        { id: "saas_glass_prompt", name: "Saas Glass" },
     ],
 
     // ======================

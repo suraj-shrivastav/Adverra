@@ -12,18 +12,18 @@ const PlatformSelector = ({ platform, setPlatform }) => {
 
     return (
         <div className="space-y-3">
-            <label className="text-sm font-medium text-gray-300">Platform</label>
+            <label className="text-[10px] font-black text-gray-600 uppercase tracking-[0.2em] pl-1">Platform</label>
             <div className="grid grid-cols-3 gap-3">
                 {platforms.map((p) => (
                     <button
                         key={p.id}
                         onClick={() => setPlatform(p.id)}
-                        className={`flex items-center justify-center gap-2 py-3 rounded-xl border text-sm font-medium transition-all duration-200 ${platform === p.id
-                            ? "bg-[#141414] border-gray-500 text-gray-200"
-                            : "bg-[#111] border-gray-800 text-gray-500 hover:border-gray-700"
+                        className={`flex items-center justify-center gap-2 py-3 rounded-2xl border text-xs font-black uppercase tracking-widest transition-all duration-300 ${platform === p.id
+                            ? "bg-white border-white text-black shadow-lg shadow-white/10"
+                            : "bg-black/30 border-white/10 text-gray-500 hover:border-white/20 hover:text-white"
                             }`}
                     >
-                        <span className="text-gray-400">{p.icon}</span>
+                        <span className={platform === p.id ? "text-black" : "text-gray-600"}>{p.icon}</span>
                         <span>{p.id}</span>
                     </button>
                 ))}

@@ -4,25 +4,34 @@ const BrandModal = ({ isOpen, onClose, onSubmit, url, setUrl, isSubmitting }) =>
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-            <div className="w-full max-w-md bg-[#0f0f0f] border border-gray-800 rounded-2xl shadow-2xl overflow-hidden">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            {/* Backdrop */}
+            <div
+                className="absolute inset-0 bg-black/80 backdrop-blur-sm animate-in fade-in duration-300"
+                onClick={onClose}
+            />
+
+            {/* Modal Content */}
+            <div className="relative w-full max-w-md bg-[#0a0a0a] border border-white/10 rounded-[40px] shadow-[0_32px_120px_rgba(0,0,0,0.8)] overflow-hidden animate-in zoom-in-95 fade-in duration-300">
+                {/* Glow Effect */}
+                <div className="absolute -top-24 -left-24 w-48 h-48 bg-white/5 blur-[80px] rounded-full pointer-events-none" />
 
                 {/* Modal Header */}
-                <div className="p-5 border-b border-gray-800 bg-[#0f0f0f]">
-                    <h3 className="text-lg font-semibold text-white">Add Brand via URL</h3>
+                <div className="p-8 pb-4 border-b border-white/5 relative">
+                    <h3 className="text-2xl font-black text-white tracking-tighter font-space uppercase">Add Brand Workspace</h3>
+                    <p className="text-gray-600 text-[10px] font-bold uppercase tracking-[0.2em] mt-2">Initialize through domain extraction</p>
                 </div>
 
                 {/* Modal Body */}
-                <div className="p-6 space-y-4">
-                    <div className="space-y-2">
-                        <label className="text-xs text-gray-500 font-medium ml-1">Website URL</label>
+                <div className="p-8 space-y-6">
+                    <div className="space-y-3">
+                        <label className="text-[10px] font-black text-gray-600 uppercase tracking-[0.3em] pl-1">Network Address</label>
                         <input
                             autoFocus
-                            className="w-full bg-black border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:border-blue-500 outline-none transition-all"
-                            placeholder="https://example.com"
+                            className="w-full bg-black/40 border border-white/5 hover:border-white/10 rounded-2xl px-6 py-4 text-sm text-white placeholder:text-gray-800 focus:border-white/20 outline-none transition-all shadow-inner font-outfit"
+                            placeholder="https://brand-domain.com"
                             value={url}
                             onChange={(e) => setUrl(e.target.value)}
-                            // Allow pressing Enter to submit
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter' && url && !isSubmitting) {
                                     onSubmit();
@@ -33,19 +42,19 @@ const BrandModal = ({ isOpen, onClose, onSubmit, url, setUrl, isSubmitting }) =>
                 </div>
 
                 {/* Modal Footer */}
-                <div className="p-5 border-t border-gray-800 bg-[#0a0a0a] flex justify-end gap-3">
-                    <button
-                        onClick={onClose}
-                        className="px-5 py-2.5 rounded-xl text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-900 transition-colors"
-                    >
-                        Cancel
-                    </button>
+                <div className="p-8 pt-4 flex flex-col gap-3 relative">
                     <button
                         onClick={onSubmit}
                         disabled={!url || isSubmitting}
-                        className="px-6 py-2.5 rounded-xl text-sm font-medium text-black bg-white hover:bg-gray-200 transition-all disabled:opacity-50"
+                        className="w-full py-4 rounded-2xl text-sm font-black uppercase tracking-widest text-black bg-white hover:bg-gray-200 transition-all disabled:opacity-30 disabled:cursor-not-allowed font-space shadow-[0_8px_32px_rgba(255,255,255,0.1)]"
                     >
-                        {isSubmitting ? 'Processing...' : 'Add Brand'}
+                        {isSubmitting ? 'Extracting Identity...' : 'Initialize Brand'}
+                    </button>
+                    <button
+                        onClick={onClose}
+                        className="w-full py-3 text-[10px] font-black uppercase tracking-widest text-gray-700 hover:text-white transition-colors font-space"
+                    >
+                        Cancel Connection
                     </button>
                 </div>
             </div>

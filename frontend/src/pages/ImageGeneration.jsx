@@ -85,7 +85,7 @@ const ImageGeneration = () => {
     // Render
     // ------------------
     return (
-        <div className="flex h-screen bg-black text-gray-200 font-sans overflow-hidden">
+        <div className="flex h-full bg-black text-gray-200 font-outfit overflow-hidden">
             <BrandSidebar
                 brands={brands}
                 selectedBrandId={selectedBrandId}
@@ -94,18 +94,24 @@ const ImageGeneration = () => {
                 isLoading={isLoadingBrands}
             />
 
-            <GenerationControls
-                formData={formData}
-                setFormData={updateFormData}
-                visualTones={visualTones}
-                isLoadingData={isLoadingBrands}
-                isGenerating={isGenerating}
-                handlers={{
-                    onImageUpload: handleImageUpload,
-                    onImageRemove: removeUploadedImage,
-                    onGenerate: handleGenerate,
-                }}
-            />
+            <div className="flex-1 flex flex-col h-full overflow-hidden relative">
+
+                {/* Controls Area */}
+                <div className="flex-1 overflow-hidden">
+                    <GenerationControls
+                        formData={formData}
+                        setFormData={updateFormData}
+                        visualTones={visualTones}
+                        isLoadingData={isLoadingBrands}
+                        isGenerating={isGenerating}
+                        handlers={{
+                            onImageUpload: handleImageUpload,
+                            onImageRemove: removeUploadedImage,
+                            onGenerate: handleGenerate,
+                        }}
+                    />
+                </div>
+            </div>
 
             <BrandModal
                 isOpen={isBrandModalOpen}

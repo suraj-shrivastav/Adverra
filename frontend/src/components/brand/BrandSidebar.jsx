@@ -1,58 +1,99 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronDown, LogOut } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
+import { ChevronDown, Check, Plus } from 'lucide-react';
 import BrandCard from './BrandCard';
 
-const BrandSidebar = ({ brands, selectedBrandId, onBrandChange, selectedBrandData }) => {
-    const { logout } = useAuth();
+const BrandSidebar = ({
+    brands,
+    selectedBrandId,
+    onBrandChange,
+    selectedBrandData,
+    title = "Generation Hub",
+    subtitle = "Initialize your brand's creative assets."
+}) => {
     const navigate = useNavigate();
+    const [isOpen, setIsOpen] = useState(false);
+    const dropdownRef = useRef(null);
 
-    const handleLogout = () => {
-        logout();
-        navigate('/login');
+    const selectedBrand = brands.find(b => b.id === selectedBrandId);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setIsOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    const handleBrandSelect = (brandId) => {
+        onBrandChange({ target: { value: brandId } });
+        setIsOpen(false);
     };
 
     return (
-        <div className="w-[420px] border-r border-gray-900 flex flex-col p-8 gap-6 shrink-0 h-full overflow-y-auto custom-scrollbar">
-            <div className="flex items-start justify-between">
-                <div className="space-y-1">
-                    <h1 className="text-2xl font-semibold text-white tracking-tight">Image Generation</h1>
-                    <p className="text-sm text-gray-500">Manage brand context and generate assets</p>
-                </div>
-                <button
-                    onClick={handleLogout}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-gray-400 text-sm font-medium hover:bg-white/10 hover:text-white hover:border-white/20 transition-all"
-                    title="Logout"
-                >
-                    <LogOut size={14} />
-                    <span>Logout</span>
-                </button>
+        <div className="w-[420px] border-r border-white/5 flex flex-col p-10 gap-8 shrink-0 h-full overflow-y-auto scrollbar-hide bg-[#050505] font-outfit">
+            <div className="space-y-2">
+                <h1 className="text-3xl font-black text-white tracking-tighter font-space">
+                    {title}
+                </h1>
+                <p className="text-gray-500 text-xs font-medium tracking-wide uppercase">{subtitle}</p>
             </div>
 
-            <div className="space-y-2.5">
-                <label className="text-xs font-medium text-gray-500 uppercase tracking-wider pl-1">Select Brand</label>
-                <div className="relative group">
-                    <select
-                        value={selectedBrandId}
-                        onChange={onBrandChange}
-                        className="w-full bg-[#0a0a0a] hover:bg-[#111111] border border-gray-800/60 hover:border-gray-700 text-white px-5 py-3.5 pr-12 rounded-xl appearance-none outline-none focus:border-gray-600 focus:bg-[#141414] transition-all duration-300 cursor-pointer shadow-[inset_0_1px_2px_rgba(0,0,0,0.4)] font-medium text-[15px]"
-                        style={{
-                            backgroundImage: 'none'
-                        }}
+            <div className="space-y-3">
+                <label className="text-[10px] font-black text-gray-600 uppercase tracking-[0.3em] pl-1">
+                    Select Context
+                </label>
+
+                <div className="relative" ref={dropdownRef}>
+                    <button
+                        onClick={() => setIsOpen(!isOpen)}
+                        className="w-full bg-white/[0.02] hover:bg-white/[0.04] border border-white/5 hover:border-white/10 text-white px-6 py-4 pr-12 rounded-2xl outline-none transition-all duration-300 cursor-pointer shadow-2xl font-black text-sm text-left backdrop-blur-3xl font-space"
                     >
-                        {brands.map(item => (
-                            <option key={item.id} value={item.id} className="bg-[#0a0a0a] text-white py-3">{item.title}</option>
-                        ))}
-                        <option disabled className="bg-[#0a0a0a]"></option>
-                        <option value="ADD_NEW_URL" className="bg-[#0a0a0a] text-gray-400 font-medium">+ Add Brand via URL</option>
-                    </select>
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+                        <span>{selectedBrand?.title || "Choose Brand"}</span>
+                    </button>
+
+                    <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none">
                         <ChevronDown
-                            size={18}
-                            className="text-gray-600 group-hover:text-gray-400 transition-colors duration-300"
+                            size={16}
+                            className={`text-gray-600 transition-all duration-300 ${isOpen ? 'rotate-180 text-white' : ''}`}
                         />
                     </div>
+
+                    {isOpen && (
+                        <div className="absolute top-full left-0 right-0 mt-3 bg-[#0a0a0a] border border-white/10 rounded-2xl shadow-[0_24px_80px_rgba(0,0,0,0.5)] overflow-hidden z-[100] backdrop-blur-3xl">
+                            <div className="py-2 max-h-[320px] overflow-y-auto scrollbar-hide">
+                                {brands.map((brand) => (
+                                    <button
+                                        key={brand.id}
+                                        onClick={() => handleBrandSelect(brand.id)}
+                                        className="w-full px-5 py-4 text-left hover:bg-white/[0.03] transition-all flex items-center justify-between group"
+                                    >
+                                        <span className={`text-sm font-black font-space uppercase tracking-tight ${brand.id === selectedBrandId ? 'text-white' : 'text-gray-500 group-hover:text-gray-300'}`}>
+                                            {brand.title}
+                                        </span>
+                                        {brand.id === selectedBrandId && (
+                                            <Check size={14} className="text-white" />
+                                        )}
+                                    </button>
+                                ))}
+
+                                <div className="my-2 mx-4 border-t border-white/5"></div>
+
+                                <button
+                                    onClick={() => handleBrandSelect('ADD_NEW_URL')}
+                                    className="w-full px-5 py-4 text-left hover:bg-white/[0.03] transition-all flex items-center gap-3 group"
+                                >
+                                    <Plus size={14} className="text-gray-600 group-hover:text-white" />
+                                    <span className="text-sm font-black font-space uppercase tracking-tight text-gray-600 group-hover:text-white">
+                                        Add Brand Context
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
 

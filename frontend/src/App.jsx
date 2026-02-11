@@ -6,39 +6,63 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ImageGeneration from "./pages/ImageGeneration";
 import { useAuth } from "./context/AuthContext";
+import CampaignGeneration from "./pages/CampaignGeneration";
+import Navbar from "./components/Navbar";
 
 const ProtectedRoute = ({ children }) => {
   const { user, session } = useAuth();
-  // console.log(user);
   if (!user) {
     return <Navigate to="/login" />;
   }
-  useEffect(() => {
-    // console.log(session);
-  }, [session])
   return children;
 };
 
 const App = () => {
-  const { user } = useAuth();
-
   return (
-    <Routes>
-      {/* Protected */}
-      <Route
-        path="/"
-        element={
-          <ProtectedRoute>
-            <ImageGeneration />
-          </ProtectedRoute>
-        }
-      />
+    <div className="min-h-screen bg-black overflow-x-hidden text-white">
+      <Navbar />
+      <Routes>
+        {/* Public */}
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
 
-      <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<Signup />} />
+        {/* Protected */}
+        <Route
+          path="/image"
+          element={
+            <ProtectedRoute>
+              <div className="pt-24 h-screen">
+                <ImageGeneration />
+              </div>
+            </ProtectedRoute>
+          }
+        />
 
-      <Route path="/landing" element={<LandingPage />} />
-    </Routes>
+        <Route
+          path="/campaign"
+          element={
+            <ProtectedRoute>
+              <div className="pt-24 h-screen">
+                <CampaignGeneration />
+              </div>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Audio Placeholder */}
+        <Route
+          path="/audio"
+          element={
+            <ProtectedRoute>
+              <div className="pt-24 h-screen flex items-center justify-center bg-black text-white font-space">
+                <h1 className="text-4xl font-black uppercase tracking-widest text-gray-800">COMING SOON</h1>
+              </div>
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </div>
   );
 };
 

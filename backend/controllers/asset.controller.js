@@ -7,8 +7,8 @@ import { uploadImageToGemini } from "../utils/uploadImage.js";
 import { supabase } from "../config/supabase.js";
 import fs from "fs/promises";
 
-const buildPrompt = ({ designType, text, brand }) => {
-    const style = imagePrompts[designType] || imagePrompts.retro_cel_shaded_prompt;
+const buildPrompt = ({ selectedToneId, text, brand }) => {
+    const style = imagePrompts[selectedToneId] || imagePrompts.retro_cel_shaded_prompt;
 
     if (!brand) {
         return `${style}\n\n${text}`;
@@ -52,7 +52,7 @@ export const generateImage = async (req, res) => {
         }
 
         const {
-            designType,
+            selectedToneId,
             prompt,
             additionalContext,
             brandData,
@@ -61,10 +61,13 @@ export const generateImage = async (req, res) => {
             aspectRatio = "1:1",
         } = req.body;
 
-        const text = additionalContext || prompt;
-        if (!text) {
-            return res.status(400).json({ success: false, message: "Prompt required" });
-        }
+        // const text = additionalContext || prompt;
+        // if (!text) {
+        //     return res.status(400).json({ success: false, message: "Prompt required" });
+        // }
+
+        console.log(req.body);
+        // return true;
 
         // Process logos concurrently
         const processedLogos = await Promise.all(
@@ -88,16 +91,21 @@ export const generateImage = async (req, res) => {
         ].slice(0, 4);
 
         const finalPrompt = buildPrompt({
-            designType,
-            text,
+            selectedToneId,
+            text: prompt,
             brand: brandData,
         });
+
+        const optimizedFinalPrompt = buildImageParts(refs, finalPrompt);
+
+        console.log(optimizedFinalPrompt);
+        // return;
 
         const response = await genAI.models.generateContent({
             model: "gemini-3-pro-image-preview",
             contents: {
                 role: "user",
-                parts: buildImageParts(refs, finalPrompt),
+                parts: optimizedFinalPrompt,
             },
             config: {
                 imageConfig: {

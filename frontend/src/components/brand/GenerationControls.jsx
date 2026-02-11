@@ -15,19 +15,21 @@ const GenerationControls = ({
 }) => {
 
     return (
-        <div className="flex-1 flex flex-col relative h-screen">
-            <div className="flex-1 overflow-y-auto p-10 pb-32 custom-scrollbar">
+        <div className="flex-1 flex flex-col relative h-full">
+            <div className="flex-1 overflow-y-auto p-10 pb-32 scrollbar-hide">
                 <div className="w-full space-y-8">
-                    <div className="border-b border-gray-800 pb-4">
-                        <h2 className="text-lg font-semibold text-white">Generation Controls</h2>
+                    <div className="text-center space-y-3">
+                        <h1 className="text-5xl font-bold text-white tracking-tight">
+                            Image Generation Hub
+                        </h1>
                     </div>
 
                     {/* Additional Context */}
                     <div className="space-y-3">
-                        <label className="text-sm font-medium text-gray-300">Additional Context</label>
+                        <label className="text-xs font-bold text-gray-600 uppercase tracking-widest pl-1">Additional Context</label>
                         <textarea
-                            className="w-full h-24 bg-[#111] border border-gray-800 rounded-2xl p-4 text-gray-200 placeholder-gray-600 focus:border-blue-600 outline-none transition-all resize-none"
-                            placeholder="Describe specific details..."
+                            className="w-full h-32 bg-black/30 border border-white/10 rounded-[2rem] p-6 text-gray-200 placeholder-gray-700 hover:border-white/20 focus:border-white/30 outline-none transition-all resize-none shadow-inner"
+                            placeholder="Describe specific details for the AI..."
                             value={formData.additionalContext}
                             onChange={(e) => setFormData({ additionalContext: e.target.value })}
                         />
@@ -47,21 +49,21 @@ const GenerationControls = ({
 
                     <div className="grid grid-cols-2 gap-6">
                         <div className="space-y-3">
-                            <label className="text-sm font-medium text-gray-300">Target Audience</label>
+                            <label className="text-xs font-bold text-gray-600 uppercase tracking-widest pl-1">Target Audience</label>
                             <input
                                 type="text"
-                                className="w-full bg-[#111] border border-gray-800 rounded-2xl px-4 py-3 text-gray-200 focus:border-blue-600 outline-none"
-                                placeholder="e.g. GenZ"
+                                className="w-full bg-black/30 border border-white/10 hover:border-white/20 focus:border-white/30 rounded-2xl px-6 py-4 text-sm text-white placeholder-gray-700 outline-none transition-all"
+                                placeholder="e.g. GenZ, Business Professionals"
                                 value={formData.targetAudience}
                                 onChange={(e) => setFormData({ targetAudience: e.target.value })}
                             />
                         </div>
                         <div className="space-y-3">
-                            <label className="text-sm font-medium text-gray-300">Text Overlay</label>
+                            <label className="text-xs font-bold text-gray-600 uppercase tracking-widest pl-1">Text Overlay</label>
                             <input
                                 type="text"
-                                className="w-full bg-[#111] border border-gray-800 rounded-2xl px-4 py-3 text-gray-200 focus:border-blue-600 outline-none"
-                                placeholder="e.g. Join the Beta"
+                                className="w-full bg-black/30 border border-white/10 hover:border-white/20 focus:border-white/30 rounded-2xl px-6 py-4 text-sm text-white placeholder-gray-700 outline-none transition-all"
+                                placeholder="e.g. Join the Hub"
                                 value={formData.textOverlay}
                                 onChange={(e) => setFormData({ textOverlay: e.target.value })}
                             />
@@ -86,8 +88,8 @@ const GenerationControls = ({
             {/* Footer */}
             <div className="absolute bottom-0 left-0 right-0 p-6 bg-black/90 backdrop-blur-xl border-t border-gray-900 flex justify-between items-center z-20">
                 <div className="flex flex-col">
-                    <span className="text-[10px] uppercase tracking-wider text-gray-500 font-bold">Estimated Cost</span>
-                    <span className="text-white font-medium">12 Credits</span>
+                    <span className="text-[10px] uppercase tracking-[0.2em] text-gray-600 font-black font-space">Estimated Power</span>
+                    <span className="text-white font-black text-xl tracking-tighter font-space">12 <span className="text-xs text-gray-500 font-medium">Credits</span></span>
                 </div>
                 <button
                     onClick={() => handlers.onGenerate(formData)}

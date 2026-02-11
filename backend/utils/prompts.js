@@ -134,6 +134,20 @@ Mood and Tone: Energetic, nostalgic, and hyper-stylized. It should feel like a "
 Rendering Rules: No 3D-lighting. High-clarity lines. Add a subtle "VHS" chromatic aberration or a light "CRT-scanline" overlay to enhance the retro-tech feel.
 `
 
+const hand_drawn_prompt = `
+Create a hand-drawn quirky illustration on a solid black background with a playful, expressive, slightly surreal aesthetic. The artwork should feel clever, character-driven, and imperfect, as if sketched by hand with confidence and humor. Drawing Style: Hand-drawn ink or marker illustration, Imperfect, organic linework with visible human strokes, Slight wobble and variation in line thickness, No vector precision, no digital cleanliness, Sketchbook or zine-style energy. Quirk and Character: Exaggerated but restrained proportions, Expressive faces, awkward poses, or odd details, Humor comes from subtle visual irony, Characters or objects feel thoughtful, confused, amused, or quietly weird, Avoid slapstick or childish cartoon tropes. Color Palette: Black background is dominant and untouched, Limited, high-contrast colors only, Accent colors: off-white, muted yellow, dull pink, teal, light blue, soft orange, Use color sparingly to create focal points, No gradients or neon effects. Texture and Fill: Flat fills with occasional rough shading, Dry-brush, crayon, or chalk-like texture allowed, White ink or muted color strokes pop against black, Visible grain or paper-like texture encouraged. Composition: Central subject with generous negative space, Strong silhouette readability, Slight asymmetry for visual interest, Poster or editorial-style framing. Mood and Tone: Quirky, clever, and slightly introspective, Calm humor, not chaos, Feels like indie illustration or editorial art, Contemporary, expressive, and human. Rendering Rules: No photorealism, No 3D rendering, No cinematic lighting, No glossy or polished effects, Maintain a flat, hand-crafted look, High resolution with visible line texture.
+`
+const hand_drawn_2_prompt = `
+Create a hand-drawn quirky illustration on a warm off-white, sketchbook-style background with subtle paper texture. The drawing should feature a slightly awkward, expressive character with asymmetrical features and playful imperfections, rendered in loose, wobbling ink lines of varying thickness. Use a limited, muted color palette—dusty blue, mustard yellow, faded coral, moss green, and charcoal black—with flat, uneven fills and visible strokes that occasionally spill outside the lines. Incorporate small humorous details like floating doodles or handwritten notes to add personality and charm. The composition should feel gently off-balance and spontaneous, with plenty of negative space. The overall mood is whimsical, cozy, and quietly funny. Avoid photorealism, gradients, or digital cleanliness—embrace imperfection, texture, and a distinctly handmade, indie illustration feel.`
+
+const saas_glass_prompt = `
+Create a sophisticated, isometric 3D composition with a 'Calm Tech' aesthetic. The visual language should communicate clarity, depth, and invisible complexity made simple. Material and Texture: The primary elements should be rendered in translucent frosted glass and matte ceramic to imply transparency and modernity. Use subsurface scattering to catch light within the glass volumes. Incorporate glowing edge details and thin, luminous data lines to represent connectivity. Composition: Gravity-free, floating arrangement with a balanced, clean layout. Use isometric or orthographic projection to provide a 'god's eye view' of the system. A soft, volumetric fog should occupy the negative space to add depth without clutter. Color and Mood: Deep, serene color fields using 'Transformative Teal' and cool ocean tones to signal eco-consciousness and resilience. The atmosphere must be orderly and professional. Lighting: Soft studio lighting with cool tones. Use subtle rim lighting to define the silhouettes of the glass edges against the background. Rendering Rules: Octane render style, raytracing enabled, high fidelity, sharp focus on the core object with gentle depth of field blur in the background. No organic chaos, no grime, no graffiti, no jagged edges, no text overlays, no low-resolution textures, no aggressive high-contrast shadows.
+`
+
+const three_d_prompt = `
+Create a 3D render with a playful, slightly surreal aesthetic, featuring a central subject with a calm, quirky personality. The style should feel like high-end editorial illustration—clever, character-driven, and visually witty. Drawing Style: 3D digital render with soft, rounded forms, Smooth surfaces with subtle imperfections, No hard edges or sharp geometry, Avoid overly realistic skin or textures, Focus on shape and form over surface detail. Quirk and Character: Subject has an expressive but subtle face, Awkward or thoughtful pose, Humor comes from visual irony or unexpected details, Avoid slapstick or childish cartoon tropes, Character feels quietly amused or introspective. Color Palette: Soft, muted, and slightly desaturated, Pastel-adjacent colors with low contrast, Cream, dusty rose, sage green, pale yellow, light blue, soft orange, Limited palette with intentional color blocking, No neon or overly vibrant colors. Lighting and Mood: Soft, diffused studio lighting, Gentle shadows that define form, No harsh highlights or dramatic contrast, Warm and inviting atmosphere, Calm and slightly whimsical mood. Composition: Central subject with generous negative space, Clean and uncluttered, Strong silhouette readability, Slight asymmetry for visual interest, Editorial or poster-style framing. Rendering Rules: No photorealism, No skin pores or fabric textures, No motion blur, No depth of field effects, Maintain a clean, stylized 3D look, High resolution with smooth surfaces.
+`
+
 const imagePrompts = {
     minimalist_pro_prompt,
     neo_minimalist_prompt,
@@ -143,7 +157,11 @@ const imagePrompts = {
     cyber_organic_prompt,
     street_brutalist_prompt,
     mid_century_gouache_prompt,
-    retro_cel_shaded_prompt
+    retro_cel_shaded_prompt,
+    hand_drawn_prompt,
+    hand_drawn_2_prompt,
+    three_d_prompt,
+    saas_glass_prompt
 
 
 }

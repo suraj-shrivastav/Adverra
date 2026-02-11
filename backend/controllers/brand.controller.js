@@ -10,6 +10,8 @@ const API_KEY = process.env.BRAND_DEV_API_KEY;
 export const extractBrandData = async (req, res) => {
     try {
         const { domain } = req.body;
+        console.log("domainL ", domain);
+        // return;
 
         if (!domain) {
             return res.status(400).json({ error: "Domain is required" });

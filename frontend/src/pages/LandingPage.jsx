@@ -25,7 +25,7 @@ const features = [
 
 const LandingPage = () => {
     return (
-        <div className="relative min-h-screen w-full bg-black text-white overflow-hidden">
+        <div className="relative min-h-screen w-full bg-black text-white overflow-y-auto scrollbar-hide">
             {/* NAVBAR */}
             <Navbar />
 
@@ -34,7 +34,6 @@ const LandingPage = () => {
                 className="
           grid min-h-screen grid-cols-1 lg:grid-cols-2
           px-6 md:px-16
-          pt-[140px] sm:pt-[160px] lg:pt-24
         "
             >
                 {/* LEFT */}
