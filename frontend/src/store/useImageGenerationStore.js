@@ -30,7 +30,7 @@ export const useImageGenerationStore = create((set, get) => ({
         // { id: "neo_minimalist_prompt", name: "Neo Minimalist" },
         { id: "risograph_vintage_prompt", name: "Risograph Vintage" },
         { id: "claymorphism_prompt", name: "Claymorphism" },
-        { id: "luxury_noir_prompt", name: "Luxury Noir" },
+        { id: "retro_cel_shaded_prompt", name: "Retro Cel Shaded" },
         { id: "cyber_organic_prompt", name: "Cyber Organic" },
         { id: "hand_drawn_prompt", name: "Hand Drawn" },
         { id: "hand_drawn_2_prompt", name: "Hand Drawn 2" },

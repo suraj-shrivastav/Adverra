@@ -36,7 +36,7 @@ const CampaignGeneration = () => {
     const [isLoadingHistory, setIsLoadingHistory] = useState(false);
     const [selectedHistoryItem, setSelectedHistoryItem] = useState(null);
 
-    const selectedBrandData = getSelectedBrand();
+    const selectedBrand = brands.find(b => b.id == selectedBrandId);
 
     useEffect(() => {
         getAllBrands();
@@ -77,7 +77,15 @@ const CampaignGeneration = () => {
     };
 
     const handleGenerate = async () => {
-        if (!prompt || !selectedBrandId) return;
+        if (!selectedBrandId) {
+            // Visual feedback if brand is missing
+            const selector = document.querySelector('button[class*="border-white/20"]');
+            if (selector) {
+                selector.classList.add('animate-shake');
+                setTimeout(() => selector.classList.remove('animate-shake'), 500);
+            }
+            return;
+        }
 
         try {
             setIsGenerating(true);
@@ -92,7 +100,7 @@ const CampaignGeneration = () => {
                 },
                 campaignData: {
                     platforms,
-                    ...selectedBrandData
+                    ...selectedBrand
                 }
             };
 
@@ -222,7 +230,7 @@ const CampaignGeneration = () => {
             <BrandSidebar
                 brands={brands}
                 selectedBrandId={selectedBrandId}
-                selectedBrandData={selectedBrandData}
+                selectedBrandData={selectedBrand}
                 onBrandChange={handleBrandChange}
                 isLoading={isLoadingBrands}
                 title="Campaign Generation"
@@ -230,6 +238,33 @@ const CampaignGeneration = () => {
             />
 
             <div className="flex-1 flex flex-col h-full overflow-hidden relative">
+                {/* Fancy Background Text Overlay */}
+                <div className="absolute inset-0 overflow-hidden pointer-events-none select-none opacity-[0.05] z-0 font-space">
+                    <div className="absolute top-[5%] -left-20 -rotate-12 text-[120px] font-black tracking-tighter whitespace-nowrap">
+                        STRATEGY → EXECUTION
+                    </div>
+                    <div className="absolute top-[25%] -right-40 rotate-6 text-[150px] font-black tracking-tighter whitespace-nowrap">
+                        INSIGHT TO IMPACT
+                    </div>
+                    <div className="absolute bottom-[15%] -left-20 -rotate-6 text-[130px] font-black tracking-tighter whitespace-nowrap">
+                        FROM IDEA TO INBOX
+                    </div>
+                    <div className="absolute top-[45%] -left-60 rotate-12 text-[140px] font-black tracking-tighter whitespace-nowrap">
+                        DATA-DRIVEN CREATIVITY
+                    </div>
+                    <div className="absolute -bottom-10 right-20 -rotate-12 text-[110px] font-black tracking-tighter whitespace-nowrap">
+                        AUTOMATED. OPTIMIZED. SCALABLE.
+                    </div>
+                    <div className="absolute -top-20 right-40 rotate-[25deg] text-[160px] font-black tracking-tighter whitespace-nowrap">
+                        CAMPAIGNS THAT CONVERT
+                    </div>
+                    <div className="absolute top-[75%] -right-40 -rotate-12 text-[140px] font-black tracking-tighter whitespace-nowrap">
+                        INTELLIGENT MARKETING FLOWS
+                    </div>
+                    <div className="absolute bottom-[45%] right-20 rotate-12 text-[130px] font-black tracking-tighter whitespace-nowrap">
+                        PRECISION AT SCALE
+                    </div>
+                </div>
                 {/* History Button */}
                 <div className="absolute top-8 right-8 z-10">
                     <button
@@ -333,7 +368,7 @@ const CampaignGeneration = () => {
                                 <div className="absolute bottom-5 right-5">
                                     <button
                                         onClick={handleGenerate}
-                                        disabled={isGenerating || !prompt || !selectedBrandId}
+                                        disabled={isGenerating}
                                         className="bg-white text-black px-6 py-3 rounded-2xl text-sm font-semibold hover:bg-gray-200 disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-2 transition-all"
                                     >
                                         {isGenerating ? (

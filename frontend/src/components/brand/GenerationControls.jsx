@@ -18,12 +18,6 @@ const GenerationControls = ({
         <div className="flex-1 flex flex-col relative h-full">
             <div className="flex-1 overflow-y-auto p-10 pb-32 scrollbar-hide">
                 <div className="w-full space-y-8">
-                    <div className="text-center space-y-3">
-                        <h1 className="text-5xl font-bold text-white tracking-tight">
-                            Image Generation Hub
-                        </h1>
-                    </div>
-
                     {/* Additional Context */}
                     <div className="space-y-3">
                         <label className="text-xs font-bold text-gray-600 uppercase tracking-widest pl-1">Additional Context</label>

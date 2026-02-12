@@ -91,6 +91,7 @@ const ImageGeneration = () => {
                 selectedBrandId={selectedBrandId}
                 selectedBrandData={selectedBrandData}
                 onBrandChange={handleBrandChange}
+                title='Image Generation'
                 isLoading={isLoadingBrands}
             />
 
