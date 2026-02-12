@@ -32,7 +32,7 @@ const Navbar = () => {
                             <div className="w-7 h-7 sm:w-8 sm:h-8 bg-white/10 rounded-xl flex items-center justify-center border border-white/10 group-hover:border-white/20 transition-all">
                                 <LayoutGrid size={16} className="sm:w-[18px] sm:h-[18px] text-white" />
                             </div>
-                            <span className="text-lg sm:text-xl font-black text-white tracking-tighter font-space uppercase">Hub</span>
+                            <span className="text-lg sm:text-xl font-black text-white tracking-tighter font-space uppercase">Adverra</span>
                         </Link>
                     </div>
 
@@ -162,7 +162,7 @@ const Navbar = () => {
                                     className="w-full flex items-center justify-center gap-3 px-6 py-3 sm:py-4 bg-white/[0.03] hover:bg-white/10 border border-white/5 hover:border-white/20 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] text-gray-400 hover:text-white transition-all font-space group"
                                 >
                                     <LogOut size={16} className="group-hover:rotate-12 transition-transform" />
-                                    Logout of Hub
+                                    Logout of Adverra
                                 </button>
 
                                 <button

@@ -79,7 +79,7 @@ const Login = () => {
 
                 {/* Footer */}
                 <p className="mt-8 text-center text-sm text-gray-600">
-                    New to the hub?{" "}
+                    New to Adverra?{" "}
                     <Link
                         to="/signup"
                         className="text-white hover:text-gray-300 font-black tracking-tight transition-colors"

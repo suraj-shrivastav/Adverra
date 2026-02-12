@@ -53,7 +53,7 @@ export default function AudioPage() {
             {/* Main Content */}
             <div className="flex-1 h-full relative overflow-hidden">
                 {/* Fancy Background Text Overlay */}
-                <div className="absolute inset-0 overflow-hidden pointer-events-none select-none opacity-[0.04] z-0 font-space">
+                <div className="absolute inset-0 overflow-hidden pointer-events-none select-none opacity-[0.05] z-0 font-space">
                     <div className="absolute top-[5%] -left-20 -rotate-12 text-[120px] font-black tracking-tighter whitespace-nowrap">
                         VOICE → RESONANCE
                     </div>
@@ -63,7 +63,7 @@ export default function AudioPage() {
                     <div className="absolute bottom-[15%] -left-20 -rotate-6 text-[130px] font-black tracking-tighter whitespace-nowrap">
                         FROM SCRIPT TO SPEECH
                     </div>
-                    <Mic size={300} className="absolute -top-20 -right-20 rotate-12" />
+                    <Mic size={300} className="absolute -top-10 -right-20 rotate-12" />
                     <Headphones size={250} className="absolute top-[40%] -left-20 -rotate-12" />
                     <Volume2 size={200} className="absolute bottom-10 right-[10%] rotate-6" />
                 </div>

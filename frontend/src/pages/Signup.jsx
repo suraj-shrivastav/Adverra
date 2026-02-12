@@ -33,7 +33,7 @@ const Signup = () => {
                 {/* Header */}
                 <div className="mb-10 text-center">
                     <h1 className="text-4xl font-black text-white tracking-tighter font-space mb-3">
-                        Join Hub
+                        Join Adverra
                     </h1>
                     <p className="text-gray-500 text-sm font-medium tracking-wide">
                         Initialize your brand's creative workspace.
@@ -95,12 +95,12 @@ const Signup = () => {
 
                 {/* Footer */}
                 <p className="mt-8 text-center text-sm text-gray-600">
-                    Already part of the network?{" "}
+                    Already part of Adverra?{" "}
                     <Link
                         to="/login"
                         className="text-white hover:text-gray-300 font-black tracking-tight transition-colors"
                     >
-                        Login Hub
+                        Login
                     </Link>
                 </p>
             </div>
