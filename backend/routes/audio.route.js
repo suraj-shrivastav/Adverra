@@ -1,7 +1,9 @@
 import express from "express";
-import { generateAudio } from "../controllers/audio.controller.js";
+import { generateAudio, getAudios } from "../controllers/audio.controller.js";
+import { authenticateUser } from "../middleware/auth.js";
 const router = express.Router();
 
-router.post("/", generateAudio);
+router.post("/", authenticateUser, generateAudio);
+router.get("/", authenticateUser, getAudios);
 
 export default router;

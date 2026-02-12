@@ -3,7 +3,8 @@ import BrandSidebar from '../components/brand/BrandSidebar';
 import BrandModal from '../components/brand/BrandModal';
 import { useImageGenerationStore } from '../store/useImageGenerationStore';
 import { api } from '../libs/api';
-import { Loader2, Send, Copy, Check, Instagram, Twitter, Linkedin, Facebook, Pin, Globe, History, X, Calendar } from 'lucide-react';
+import { Loader2, Send, Copy, Check, Instagram, Twitter, Linkedin, Facebook, Pin, Globe, History, X, Calendar, Play, Megaphone } from 'lucide-react';
+import HistoryModal from '../components/common/HistoryModal';
 
 const CampaignGeneration = () => {
     const {
@@ -414,83 +415,45 @@ const CampaignGeneration = () => {
             )}
 
             {/* History Modal */}
-            {showHistoryModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/95 backdrop-blur-xl">
-                    <div className={`bg-neutral-950 border border-white/10 rounded-[2.5rem] ${selectedHistoryItem ? 'w-full max-w-6xl h-[85vh]' : 'w-full max-w-xl max-h-[85vh]'
-                        } overflow-hidden shadow-2xl`}>
-                        <div className="p-10 h-full flex flex-col">
-                            <div className="flex items-center justify-between mb-8 flex-shrink-0">
-                                <div className="flex items-center gap-4">
-                                    {selectedHistoryItem && (
-                                        <button
-                                            onClick={() => setSelectedHistoryItem(null)}
-                                            className="p-2.5 bg-black/40 hover:bg-black/60 rounded-2xl text-gray-500 hover:text-white transition-all"
-                                        >
-                                            <X size={20} />
-                                        </button>
-                                    )}
-                                    <div>
-                                        <h2 className="text-3xl font-bold text-white">
-                                            {selectedHistoryItem ? "Campaign Details" : "History"}
-                                        </h2>
-                                    </div>
-                                </div>
-                                {!selectedHistoryItem && (
-                                    <button
-                                        onClick={() => setShowHistoryModal(false)}
-                                        className="p-2.5 bg-black/40 hover:bg-black/60 rounded-2xl text-gray-500 hover:text-white transition-all"
-                                    >
-                                        <X size={20} />
-                                    </button>
-                                )}
-                            </div>
-
-                            <div className="flex-1 min-h-0 overflow-y-auto scrollbar-hide">
-                                {isLoadingHistory ? (
-                                    <div className="h-64 flex flex-col items-center justify-center space-y-4">
-                                        <Loader2 size={32} className="animate-spin text-gray-600" />
-                                        <p className="text-xs font-medium uppercase tracking-wider text-gray-700">Loading...</p>
-                                    </div>
-                                ) : selectedHistoryItem ? (
-                                    <div className="h-full">
-                                        <CampaignDetailView
-                                            campaign={selectedHistoryItem.campaign}
-                                            createdAt={selectedHistoryItem.created_at}
-                                        />
-                                    </div>
-                                ) : historyCampaigns.length > 0 ? (
-                                    <div className="space-y-3 pr-2">
-                                        {historyCampaigns.map((item) => (
-                                            <button
-                                                key={item.id}
-                                                onClick={() => setSelectedHistoryItem(item)}
-                                                className="w-full bg-black/30 hover:bg-black/50 border border-white/5 hover:border-white/10 p-6 rounded-3xl text-left transition-all group"
-                                            >
-                                                <h4 className="text-lg font-semibold text-gray-400 group-hover:text-white mb-2 transition-colors">
-                                                    {item.campaign?.title || "Untitled Campaign"}
-                                                </h4>
-                                                <div className="flex items-center gap-2 text-xs text-gray-600">
-                                                    <Calendar size={12} />
-                                                    {new Date(item.created_at).toLocaleDateString(undefined, {
-                                                        month: 'short',
-                                                        day: 'numeric',
-                                                        year: 'numeric'
-                                                    })}
-                                                </div>
-                                            </button>
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <div className="h-64 flex flex-col items-center justify-center text-gray-700 space-y-4">
-                                        <History size={48} className="opacity-20" />
-                                        <p className="text-sm text-center">No campaigns yet.<br />Create your first one to get started.</p>
-                                    </div>
-                                )}
+            <HistoryModal
+                isOpen={showHistoryModal}
+                onClose={() => {
+                    setShowHistoryModal(false);
+                    setSelectedHistoryItem(null);
+                }}
+                items={historyCampaigns}
+                onItemClick={(item) => setSelectedHistoryItem(item)}
+                selectedItem={selectedHistoryItem}
+                setSelectedItem={setSelectedHistoryItem}
+                isLoading={isLoadingHistory}
+                icon={<Megaphone size={20} />}
+                title="Campaign History"
+                emptyMessage="No campaigns yet.\nCreate your first one to get started."
+                renderListItem={(item) => (
+                    <button className="w-full bg-black/30 hover:bg-black/50 border border-white/5 hover:border-white/10 p-6 rounded-3xl text-left transition-all group flex items-center justify-between">
+                        <div>
+                            <h4 className="text-lg font-semibold text-gray-400 group-hover:text-white mb-2 transition-colors">
+                                {item.campaign?.title || "Untitled Campaign"}
+                            </h4>
+                            <div className="flex items-center gap-2 text-xs text-gray-600">
+                                <Calendar size={12} />
+                                {new Date(item.created_at).toLocaleDateString(undefined, {
+                                    month: 'short',
+                                    day: 'numeric',
+                                    year: 'numeric'
+                                })}
                             </div>
                         </div>
-                    </div>
-                </div>
-            )}
+                        <Megaphone size={20} className="text-gray-600 group-hover:text-white transition-colors" />
+                    </button>
+                )}
+                renderDetails={(item) => (
+                    <CampaignDetailView
+                        campaign={item.campaign}
+                        createdAt={item.created_at}
+                    />
+                )}
+            />
 
             <BrandModal
                 isOpen={isBrandModalOpen}

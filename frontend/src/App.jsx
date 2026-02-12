@@ -8,6 +8,7 @@ import ImageGeneration from "./pages/ImageGeneration";
 import { useAuth } from "./context/AuthContext";
 import CampaignGeneration from "./pages/CampaignGeneration";
 import Navbar from "./components/Navbar";
+import AudioPage from "./pages/AudioPage";
 
 const ProtectedRoute = ({ children }) => {
   const { user, session } = useAuth();
@@ -55,8 +56,8 @@ const App = () => {
           path="/audio"
           element={
             <ProtectedRoute>
-              <div className="pt-24 h-screen flex items-center justify-center bg-black text-white font-space">
-                <h1 className="text-4xl font-black uppercase tracking-widest text-gray-800">COMING SOON</h1>
+              <div className="pt-24 h-screen">
+                <AudioPage />
               </div>
             </ProtectedRoute>
           }

@@ -5,6 +5,7 @@ export const useDataStore = create((set) => ({
     brands: [],
     campaigns: [],
     assets: [],
+    audios: [],
 
     getAllBrands: async () => {
         try {
@@ -51,6 +52,15 @@ export const useDataStore = create((set) => ({
         } catch (error) {
             console.error('handleAssetsGeneration error:', error);
             throw error;
+        }
+    },
+
+    getAllAudios: async () => {
+        try {
+            const data = await api.get("/audio");
+            set({ audios: data ?? [] });
+        } catch (error) {
+            console.error('getAllAudios error:', error);
         }
     }
 }));

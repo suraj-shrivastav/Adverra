@@ -1,49 +1,80 @@
 import genAI from "../config/gemini.js"
-import wav from "wav";
 import { supabase } from "../config/supabase.js";
-import fs from "fs";
 
-const saveWaveFile = async (filename, pcmData, channels = 1, rate = 24000, sampleWidth = 2) => {
-    const promise = new Promise((resolve, reject) => {
-        const writer = new wav.FileWriter(`./audio/ads/${filename}-campaign.wav`, {
-            channels,
-            sampleRate: rate,
-            bitDepth: sampleWidth * 8,
-        });
-        writer.on('finish', resolve);
-        writer.on('error', reject);
-        writer.write(pcmData);
-        console.log("PCM data: ", pcmData);
-        writer.end();
-    })
-        .then(async () => {
-            console.log("Wave file saved successfully");
-            const { data, error } = await supabase.storage.from("brand_audio").upload(`./audio/ads/${filename}-campaign.wav`, fs.createReadStream(`./audio/ads/${filename}-campaign.wav`));
-            if (error) {
-                console.error("Error uploading wave file:", error);
-            }
-            console.log("Wave file uploaded successfully");
-            if (data.publicUrl) {
-                const { dbData, error } = await supabase.from("brand_audio").insert({
+const createWavHeader = (dataSize, channels = 1, sampleRate = 24000, bitDepth = 16) => {
+    const header = Buffer.alloc(44);
+    header.write('RIFF', 0);
+    header.writeUInt32LE(36 + dataSize, 4);
+    header.write('WAVE', 8);
+    header.write('fmt ', 12);
+    header.writeUInt32LE(16, 16);
+    header.writeUInt16LE(1, 20); // PCM format
+    header.writeUInt16LE(channels, 22);
+    header.writeUInt32LE(sampleRate, 24);
+    header.writeUInt32LE(sampleRate * channels * (bitDepth / 8), 28);
+    header.writeUInt16LE(channels * (bitDepth / 8), 32);
+    header.writeUInt16LE(bitDepth, 34);
+    header.write('data', 36);
+    header.writeUInt32LE(dataSize, 40);
+    return header;
+};
+
+const saveWaveFile = async (filename, pcmData, userId, script, formData, channels = 1, rate = 24000, sampleWidth = 2) => {
+    try {
+        const storagePath = `audio/ads/${filename}-${Date.now()}.wav`;
+        const header = createWavHeader(pcmData.length, channels, rate, sampleWidth * 8);
+        const wavBuffer = Buffer.concat([header, pcmData]);
+
+        console.log("Wave file constructed in memory");
+
+        const { data, error } = await supabase.storage
+            .from("brand_audio")
+            .upload(storagePath, wavBuffer, {
+                upsert: true,
+                contentType: 'audio/wav'
+            });
+
+        if (error) {
+            console.error("Error uploading wave file to Supabase storage:", error);
+            return null;
+        }
+
+        console.log("Wave file uploaded directly to Supabase storage");
+
+        // getPublicUrl returns an object with a data property containing the publicUrl
+        const { data: { publicUrl } } = supabase.storage
+            .from("brand_audio")
+            .getPublicUrl(storagePath);
+
+        if (publicUrl) {
+            const { data: insertedData, error: dbError } = await supabase
+                .from("brand_audio")
+                .insert({
                     filename,
-                    publicUrl: data.publicUrl,
-                });
-                if (error) {
-                    console.error("Error inserting data into database:", error);
-                }
-                console.log("Data inserted into database successfully");
-                // return dbData;
-            }
+                    publicUrl: publicUrl,
+                    userId: userId,
+                    script: script,
+                    context: formData
+                })
+                .select()
+                .single();
 
-            return data;
-        })
-        .catch((error) => {
-            console.error("Error saving wave file:", error);
-            return error;
-        });
+            if (dbError) {
+                console.error("Error inserting data into database:", dbError);
+                return null;
+            } else {
+                console.log("Data inserted into database successfully");
+                return insertedData;
+            }
+        }
+
+    } catch (error) {
+        console.error("Error in saveWaveFile:", error);
+        return null;
+    }
 }
 
-const generateAudioScript = async (scriptContext, prompt) => {
+const generateAudioScript = async (scriptContext) => {
     try {
         const systemInstruction = `
 You are a senior Audio Copywriter and Brand Voice Director specializing in high-conversion marketing audio for ads, promos, and brand announcements.
@@ -146,7 +177,7 @@ Speaker2: You're never going to guess!
                 {
                     role: "user",
                     parts: [{
-                        text: `BrandContext: ${JSON.stringify(scriptContext)}\n\nPrompt: ${prompt}`
+                        text: `BrandContext: ${JSON.stringify(scriptContext)}`
                     }],
                 },
             ],
@@ -202,15 +233,19 @@ Speaker2: You're never going to guess!
 
 export const generateAudio = async (req, res) => {
     try {
-        const { scriptContext, prompt } = req.body;
+        const formData = req.body;
+        console.log("Script: ", formData);
+
+        // Use a default user ID if req.user is not present, matching campaign controller pattern
+        const userId = req.user?.id || "736ec2b1-9ba6-4ee9-9854-b23cd21d0061";
 
         const rawScript = await generateAudioScript(
-            JSON.stringify(scriptContext),
-            prompt
+            JSON.stringify(formData),
         );
         const script = JSON.parse(rawScript);
         console.log("Parsed Script", script);
-        const audio = await generateAudioModel(script);
+
+        const audio = await generateAudioModel(script, formData, userId);
         return res.status(200).send(audio);
     } catch (error) {
         console.error("Error generating audio script:", error);
@@ -218,7 +253,7 @@ export const generateAudio = async (req, res) => {
     }
 }
 
-const generateAudioModel = async (script) => {
+const generateAudioModel = async (script, formData, userId) => {
     try {
         const finalScript = script.script_lines.map((line) => line.text).join("\n");
         const audioConfig = {
@@ -242,7 +277,7 @@ const generateAudioModel = async (script) => {
                             speaker: "Speaker1",
                             voiceConfig: {
                                 prebuiltVoiceConfig: {
-                                    voiceName: "Schedar"
+                                    voiceName: "Kore"
                                 }
                             }
                         },
@@ -278,11 +313,33 @@ const generateAudioModel = async (script) => {
         const audioBuffer = Buffer.from(data, 'base64');
         const fileName = script.filename;
         console.log("--------------------------------------------------------------------------")
-        const audio = await saveWaveFile(fileName, audioBuffer);
+        const audio = await saveWaveFile(fileName, audioBuffer, userId, script, formData);
         console.log("Audio saved successfully", audio);
-        return true;
+        return audio;
     } catch (error) {
         console.error("Error generating audio:", error);
-        return false;
+        return null;
+    }
+}
+
+export const getAudios = async (req, res) => {
+    try {
+        const userId = "736ec2b1-9ba6-4ee9-9854-b23cd21d0061";
+        if (!userId) {
+            return res.status(403).send({ error: "Unauthorized" });
+        }
+        const { data, error } = await supabase
+            .from("brand_audio")
+            .select("*")
+
+        if (error) {
+            console.log(error);
+            return res.status(404).send({ error: "No Data Found" });
+        }
+        console.log("Audio data length:", data);
+        return res.status(200).send(data)
+    } catch (error) {
+        console.error("Error getting audio:", error);
+        return res.status(500).send({ error: "Failed to get audio" });
     }
 }
