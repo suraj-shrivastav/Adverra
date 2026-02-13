@@ -1,12 +1,27 @@
 import React from 'react';
 import { Plus, X, Loader2, AlertCircle } from 'lucide-react';
 
-const ReferenceUploader = ({ uploadedImages, onUpload, onRemove }) => {
+import PremiumSelect from './PremiumSelect';
+
+const ReferenceUploader = ({ uploadedImages, onUpload, onRemove, logoUsage, onLogoUsageChange }) => {
     return (
-        <div className="space-y-3">
-            <label className="text-[10px] font-black text-gray-600 uppercase tracking-[0.2em] pl-1">
-                Reference Materials <span className="text-gray-800 text-[10px] ml-2">({uploadedImages.length}/4)</span>
-            </label>
+        <div className="space-y-4">
+            <div className="flex items-center justify-between">
+                <label className="text-[10px] font-bold text-gray-600 uppercase tracking-[0.2em] pl-1">
+                    Reference Materials <span className="text-gray-800 text-[10px] ml-2">({uploadedImages.length}/4)</span>
+                </label>
+            </div>
+
+            <PremiumSelect
+                label="Logo Usage"
+                value={logoUsage}
+                onChange={onLogoUsageChange}
+                options={[
+                    { value: "Corner", label: "Corner" },
+                    { value: "Center", label: "Center" },
+                    { value: "None", label: "None" },
+                ]}
+            />
 
             <div className="flex gap-3 flex-wrap">
                 {uploadedImages.length < 4 && (

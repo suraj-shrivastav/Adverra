@@ -12,6 +12,7 @@ export const uploadImageToGemini = async (filePath, mimeType, displayName) => {
             displayName: displayName,
         });
 
+        console.log(uploadResponse);
         console.log(`Uploaded file ${uploadResponse.file.displayName} as: ${uploadResponse.file.uri}`);
         return uploadResponse.file;
     } catch (error) {

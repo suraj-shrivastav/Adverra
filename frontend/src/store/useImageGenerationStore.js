@@ -44,11 +44,36 @@ export const useImageGenerationStore = create((set, get) => ({
     formData: {
         platform: "Instagram",
         aspectRatio: "1:1",
-        additionalContext: "",
-        targetAudience: "",
-        textOverlay: "",
-        selectedToneId: null,
+
+        // Objective
+        objective: "Brand Awareness",
+        contentType: "Product Photography",
+        emotion: "Sophisticated",
+
+        // Audience
+        audience: {
+            ageRange: "",
+            mindset: ""
+        },
+
+        // Message
+        message: {
+            headline: "",
+            supportingText: "",
+            language: "English"
+        },
+        additionalPrompt: "",
+
+        // Visual Style
+        visualStyle: {
+            toneId: null,
+            layout: "Minimal",
+            brandExpression: "Balanced"
+        },
+
+        // References
         uploadedImages: [],
+        logoUsage: "Corner",
     },
 
     // ======================
@@ -75,13 +100,38 @@ export const useImageGenerationStore = create((set, get) => ({
     // FORM ACTIONS
     // ======================
     updateFormData: (patch) =>
-        set((state) => ({
-            formData: { ...state.formData, ...patch },
-        })),
+        set((state) => {
+            // Check for nested updates
+            if (patch.audience) {
+                return {
+                    formData: {
+                        ...state.formData,
+                        audience: { ...state.formData.audience, ...patch.audience }
+                    }
+                };
+            }
+            if (patch.message) {
+                return {
+                    formData: {
+                        ...state.formData,
+                        message: { ...state.formData.message, ...patch.message }
+                    }
+                };
+            }
+            if (patch.visualStyle) {
+                return {
+                    formData: {
+                        ...state.formData,
+                        visualStyle: { ...state.formData.visualStyle, ...patch.visualStyle }
+                    }
+                };
+            }
 
-    // ======================
-    // IMAGE UPLOADS
-    // ======================
+            return {
+                formData: { ...state.formData, ...patch },
+            };
+        }),
+
     // ======================
     // IMAGE UPLOADS
     // ======================
@@ -237,24 +287,39 @@ export const useImageGenerationStore = create((set, get) => ({
                     mimeType: img.geminiFile.mimeType,
                 }));
 
-            const brandLogos =
-                brandData?.logos?.map((logo) => ({
-                    url: logo.url,
-                    type: logo.type,
-                })) || [];
+            // Clean uploaded images for payload (only strings if URLs, or just rely on backend handling)
+            // But NormalizedInput expects { images: string[], logoUsage: ... } in references.
+            // Current backend seems to expect URI/MimeType objects. 
+            // We will stick to the existing pattern for references but map to NormalizedInput structure where possible.
 
+            // Construct Payload adhering to NormalizedInput interface
             const payload = {
                 platform: formData.platform,
                 aspectRatio: formData.aspectRatio,
-                additionalContext: formData.additionalContext,
-                targetAudience: formData.targetAudience,
-                textOverlay: formData.textOverlay,
-                selectedToneId: formData.selectedToneId,
+
+                objective: formData.objective,
+                contentType: formData.contentType,
+                emotion: formData.emotion,
+
+                audience: formData.audience,
+
+                message: formData.message,
+                additionalPrompt: formData.additionalPrompt,
+
+                visualStyle: formData.visualStyle,
+
+                brandKit: brandData, // Sending full brand data as brandKit
+
+                references: {
+                    images: referenceImages, // Passing the array of {uri, mimeType} objects. Backend might need adjustment if it strictly expects strings.
+                    logoUsage: formData.logoUsage,
+                },
+
+                // Keep flat simple fields if backend still relies on them temporarily or as fallback
                 brandId: Number(selectedBrandId),
-                brandData,
-                referenceImages,
-                brandLogos,
             };
+
+            console.log("Generating with payload:", payload);
 
             const data = await api.post("/assets/generate", payload);
             return data;

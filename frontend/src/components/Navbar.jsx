@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutGrid, Image as ImageIcon, MessageSquare, AudioLines, LogOut, User, Zap } from 'lucide-react';
+import { LayoutGrid, Image as ImageIcon, Megaphone, AudioLines, LogOut, User, Zap } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const Navbar = () => {
@@ -17,7 +17,7 @@ const Navbar = () => {
 
     const navLinks = [
         { name: 'Image', path: '/image', icon: ImageIcon },
-        { name: 'Campaign', path: '/campaign', icon: MessageSquare },
+        { name: 'Campaign', path: '/campaign', icon: Megaphone },
         { name: 'Audio', path: '/audio', icon: AudioLines },
     ];
 

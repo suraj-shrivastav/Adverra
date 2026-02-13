@@ -2,8 +2,10 @@ import React from 'react';
 import { Sparkles, Loader2 } from 'lucide-react';
 import PlatformSelector from './PlatformSelector';
 import ReferenceUploader from './ReferenceUploader';
-import VisualToneGrid from './VisualToneGrid'; // See snippet below
-import AspectRatioSelector from './AspectRatioSelector'; // Simple component extracting aspect ratio logic
+import VisualToneGrid from './VisualToneGrid';
+import AspectRatioSelector from './AspectRatioSelector';
+import PremiumInput from './PremiumInput';
+import PremiumSelect from './PremiumSelect';
 
 const GenerationControls = ({
     formData,
@@ -14,69 +16,182 @@ const GenerationControls = ({
     handlers
 }) => {
 
+    // Helper to update nested state
+    const updateNested = (category, field, value) => {
+        setFormData({
+            [category]: {
+                [field]: value
+            }
+        });
+    };
+
     return (
-        <div className="flex-1 flex flex-col relative h-full">
-            <div className="flex-1 overflow-y-auto p-10 pb-32 scrollbar-hide">
-                <div className="w-full space-y-8">
-                    {/* Additional Context */}
-                    <div className="space-y-3">
-                        <label className="text-xs font-bold text-gray-600 uppercase tracking-widest pl-1">Additional Context</label>
-                        <textarea
-                            className="w-full h-32 bg-black/30 border border-white/10 rounded-[2rem] p-6 text-gray-200 placeholder-gray-700 hover:border-white/20 focus:border-white/30 outline-none transition-all resize-none shadow-inner"
-                            placeholder="Describe specific details for the AI..."
-                            value={formData.additionalContext}
-                            onChange={(e) => setFormData({ additionalContext: e.target.value })}
-                        />
-                    </div>
+        <div className="flex-1 flex flex-col relative h-full bg-black/40">
+            <div className="flex-1 overflow-y-auto p-6 pb-32 scrollbar-hide space-y-8">
 
-                    <div className="grid grid-cols-2 gap-6">
-                        <PlatformSelector
-                            platform={formData.platform}
-                            setPlatform={(val) => setFormData({ platform: val })}
-                        />
-                        {/* Simple Aspect Ratio Button Group Logic can go here or be its own component */}
-                        <AspectRatioSelector
-                            value={formData.aspectRatio}
-                            onChange={(val) => setFormData({ aspectRatio: val })}
-                        />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-6">
-                        <div className="space-y-3">
-                            <label className="text-xs font-bold text-gray-600 uppercase tracking-widest pl-1">Target Audience</label>
-                            <input
-                                type="text"
-                                className="w-full bg-black/30 border border-white/10 hover:border-white/20 focus:border-white/30 rounded-2xl px-6 py-4 text-sm text-white placeholder-gray-700 outline-none transition-all"
-                                placeholder="e.g. GenZ, Business Professionals"
-                                value={formData.targetAudience}
-                                onChange={(e) => setFormData({ targetAudience: e.target.value })}
-                            />
-                        </div>
-                        <div className="space-y-3">
-                            <label className="text-xs font-bold text-gray-600 uppercase tracking-widest pl-1">Text Overlay</label>
-                            <input
-                                type="text"
-                                className="w-full bg-black/30 border border-white/10 hover:border-white/20 focus:border-white/30 rounded-2xl px-6 py-4 text-sm text-white placeholder-gray-700 outline-none transition-all"
-                                placeholder="e.g. Join the Hub"
-                                value={formData.textOverlay}
-                                onChange={(e) => setFormData({ textOverlay: e.target.value })}
-                            />
-                        </div>
-                    </div>
-
-                    <ReferenceUploader
-                        uploadedImages={formData.uploadedImages}
-                        onUpload={handlers.onImageUpload}
-                        onRemove={handlers.onImageRemove}
+                {/* 1. Platform & Aspect Ratio */}
+                <div className="grid grid-cols-2 gap-4 items-start">
+                    <PlatformSelector
+                        platform={formData.platform}
+                        setPlatform={(val) => setFormData({ platform: val })}
                     />
+                    <AspectRatioSelector
+                        value={formData.aspectRatio}
+                        onChange={(val) => setFormData({ aspectRatio: val })}
+                    />
+                </div>
+
+                <hr className="border-white/10" />
+
+                {/* 2. Strategy: Campaign Objective & Target Audience */}
+                <div className="grid grid-cols-2 gap-6 items-start">
+
+                    {/* Campaign Objective */}
+                    <div className="space-y-4">
+                        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Campaign Objective</h3>
+                        <PremiumSelect
+                            label="Objective"
+                            value={formData.objective}
+                            onChange={(val) => setFormData({ objective: val })}
+                            options={[
+                                { value: "Brand Awareness", label: "Brand Awareness" },
+                                { value: "Conversion", label: "Conversion" },
+                                { value: "Engagement", label: "Engagement" },
+                            ]}
+                        />
+                        <div className="grid grid-cols-2 gap-2">
+                            <PremiumSelect
+                                label="Content Type"
+                                value={formData.contentType}
+                                onChange={(val) => setFormData({ contentType: val })}
+                                options={[
+                                    { value: "Product Photography", label: "Product Photo" },
+                                    { value: "Lifestyle Illustration", label: "Lifestyle" },
+                                    { value: "Infographic", label: "Infographic" },
+                                    { value: "Abstract Art", label: "Abstract" },
+                                ]}
+                            />
+                            <PremiumSelect
+                                label="Emotion"
+                                value={formData.emotion}
+                                onChange={(val) => setFormData({ emotion: val })}
+                                options={[
+                                    { value: "Sophisticated", label: "Sophisticated" },
+                                    { value: "Playful", label: "Playful" },
+                                    { value: "Urgent", label: "Urgent" },
+                                    { value: "Trustworthy", label: "Trustworthy" },
+                                ]}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Target Audience */}
+                    <div className="space-y-4">
+                        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Target Audience</h3>
+                        <div className="space-y-4">
+                            <PremiumInput
+                                label="Age Range"
+                                placeholder="e.g. 18-24"
+                                value={formData.audience?.ageRange || ""}
+                                onChange={(val) => updateNested('audience', 'ageRange', val)}
+                            />
+                            <PremiumInput
+                                label="Mindset"
+                                placeholder="e.g. Tech-savvy"
+                                value={formData.audience?.mindset || ""}
+                                onChange={(val) => updateNested('audience', 'mindset', val)}
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <hr className="border-white/10" />
+
+                {/* 3. References & Message */}
+                <div className="grid grid-cols-2 gap-6 items-start">
+
+                    {/* References & Assets */}
+                    <div className="space-y-4">
+                        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">References & Assets</h3>
+                        <ReferenceUploader
+                            uploadedImages={formData.uploadedImages}
+                            onUpload={handlers.onImageUpload}
+                            onRemove={handlers.onImageRemove}
+                            logoUsage={formData.logoUsage}
+                            onLogoUsageChange={(val) => setFormData({ logoUsage: val })}
+                        />
+                    </div>
+
+                    {/* Message & Copy */}
+                    <div className="space-y-4">
+                        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Message & Copy</h3>
+                        <PremiumInput
+                            label="Headline"
+                            placeholder="Main headline text..."
+                            value={formData.message?.headline || ""}
+                            onChange={(val) => updateNested('message', 'headline', val)}
+                        />
+                        <PremiumInput
+                            label="Supporting Text"
+                            placeholder="Additional details..."
+                            value={formData.message?.supportingText || ""}
+                            onChange={(val) => updateNested('message', 'supportingText', val)}
+                        />
+                    </div>
+                </div>
+
+                <hr className="border-white/10" />
+
+                {/* 4. Additional Prompt */}
+                <div className="space-y-4">
+                    <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Additional Prompt</h3>
+                    <textarea
+                        className="w-full bg-white/5 border border-white/10 hover:border-white/20 focus:border-white/30 
+                                   rounded-xl px-4 py-3 text-sm text-gray-200 placeholder-gray-600 
+                                   outline-none transition-all shadow-inner focus:bg-white/10 h-24 resize-none"
+                        placeholder="Any extra instructions for the AI..."
+                        value={formData.additionalPrompt || ""}
+                        onChange={(e) => setFormData({ additionalPrompt: e.target.value })}
+                    />
+                </div>
+
+                <hr className="border-white/10" />
+
+                {/* 5. Visual Framework */}
+                <div className="space-y-4">
+                    <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Visual Framework</h3>
+                    <div className="grid grid-cols-2 gap-4">
+                        <PremiumSelect
+                            label="Layout"
+                            value={formData.visualStyle?.layout}
+                            onChange={(val) => updateNested('visualStyle', 'layout', val)}
+                            options={[
+                                { value: "Minimal", label: "Minimal" },
+                                { value: "Editorial", label: "Editorial" },
+                                { value: "Infographic", label: "Infographic" },
+                                { value: "Cinematic", label: "Cinematic" },
+                            ]}
+                        />
+                        <PremiumSelect
+                            label="Brand Expression"
+                            value={formData.visualStyle?.brandExpression}
+                            onChange={(val) => updateNested('visualStyle', 'brandExpression', val)}
+                            options={[
+                                { value: "Subtle", label: "Subtle" },
+                                { value: "Balanced", label: "Balanced" },
+                                { value: "Bold", label: "Bold" },
+                            ]}
+                        />
+                    </div>
 
                     <VisualToneGrid
                         tones={visualTones}
-                        selectedToneId={formData.selectedToneId}
-                        onSelect={(id) => setFormData({ selectedToneId: id })}
+                        selectedToneId={formData.visualStyle?.toneId}
+                        onSelect={(id) => updateNested('visualStyle', 'toneId', id)}
                         isLoading={isLoadingData}
                     />
                 </div>
+
             </div>
 
             {/* Footer */}
@@ -102,7 +217,6 @@ const GenerationControls = ({
                         </>
                     )}
                 </button>
-
             </div>
         </div>
     );

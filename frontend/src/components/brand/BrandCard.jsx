@@ -16,7 +16,7 @@ const BrandCard = ({ brandData }) => {
     };
 
     return (
-        <div className="relative bg-[#0b0b0b] border border-gray-800 rounded-3xl shadow-2xl animate-in fade-in slide-in-from-bottom-2 max-h-[calc(100vh-220px)] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        <div className="relative bg-[#0b0b0b] border border-gray-800 rounded-3xl shadow-2xl animate-in fade-in slide-in-from-bottom-2 overflow-hidden">
             {/* Gradient Header */}
             <div
                 className="absolute top-0 inset-x-0 h-16 opacity-20 pointer-events-none sticky top-0 z-0"
@@ -25,7 +25,7 @@ const BrandCard = ({ brandData }) => {
                 }}
             />
 
-            <div className="p-6 relative z-10 space-y-6">
+            <div className="p-6 relative z-10 space-y-4">
                 {/* Header */}
                 <div className="flex items-start gap-4">
                     <div className="w-14 h-14 bg-white/10 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/10 overflow-hidden shrink-0">

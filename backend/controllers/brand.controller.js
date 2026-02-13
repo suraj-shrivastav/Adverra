@@ -92,16 +92,19 @@ export const getAllBrandData = async (req, res) => {
         const { data, error } = await supabase
             .from("brand_data")
             .select("*")
+        // console.log(data);
+        const newData = data.map((item) => { return { id: item.id, brand: { title: item.brand.title, description: item.brand.description, logos: item.brand.logos, colors: item.brand.colors, slogan: item.brand.slogan, backdrops: item.brand.backdrops, domain: item.brand.domain } } })
         // .eq("userId", userId);
         // console.log("Brand Data: ", brandData);
 
+        console.log(newData)
         if (error) throw error;
 
         if (!data || data.length === 0) {
             return res.status(404).json({ message: "No brand data found" });
         }
 
-        return res.status(200).json({ data });
+        return res.status(200).json({ data: newData });
     } catch (error) {
         console.error("getAllBrandData error:", error);
         return res.status(500).json({ error: "Internal server error" });

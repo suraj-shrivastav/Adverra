@@ -162,8 +162,6 @@ const imagePrompts = {
     hand_drawn_2_prompt,
     three_d_prompt,
     saas_glass_prompt
-
-
 }
 
 export default imagePrompts;

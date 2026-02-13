@@ -4,6 +4,7 @@ const AspectRatioSelector = ({ value, onChange }) => {
     const aspectRatios = [
         { id: '16:9', label: '16:9' },
         { id: '1:1', label: '1:1' },
+        { id: '4:5', label: '4:5' },
         { id: '9:16', label: '9:16' },
     ];
 

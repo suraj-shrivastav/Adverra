@@ -6,76 +6,27 @@ import { uploadUrlImageToGemini } from "../utils/uploadUrlImageToGemini.js";
 import { uploadImageToGemini } from "../utils/uploadImage.js";
 import { supabase } from "../config/supabase.js";
 import fs from "fs/promises";
-
-const buildPrompt = ({ selectedToneId, text, brand }) => {
-    const style = imagePrompts[selectedToneId] || imagePrompts.retro_cel_shaded_prompt;
-
-    if (!brand) {
-        return `${style}\n\n${text}`;
-    }
-
-    const colors = brand.colors?.map(c => `${c.name} (${c.hex})`).join(", ");
-    const industry =
-        brand.industries?.eic?.map(i => i.subindustry || i.industry).join(", ") ||
-        "Technology";
-
-    return `
-[Design Style]
-${style}
-
-[Brand Identity]
-Name: ${brand.title}
-Industry: ${industry}
-Colors: ${colors || "Brand aligned"}
-Voice: ${brand.slogan || "Professional"}
-
-[Creative Brief]
-${text}
-
-[Rules]
-No text, no logos, no watermarks.
-High-quality, realistic, professional.
-`.trim();
-};
-
-const buildImageParts = (images, prompt) => [
-    ...(images || []).map(img => ({
-        fileData: { fileUri: img.uri, mimeType: img.mimeType },
-    })),
-    { text: prompt },
-];
+import { buildUserPrompt, systemInstructionModern, visualToneSystemInstructions } from "../utils/imageUserPrompt.js";
 
 export const generateImage = async (req, res) => {
     try {
+        const timestamp = Date.now();
         if (!req.user?.id) {
             return res.status(401).json({ success: false, message: "Unauthorized" });
         }
 
-        const {
-            selectedToneId,
-            prompt,
-            additionalContext,
-            brandData,
-            referenceImages = [],
-            brandLogos = [],
-            aspectRatio = "1:1",
-        } = req.body;
+        const data = req.body;
 
-        // const text = additionalContext || prompt;
-        // if (!text) {
-        //     return res.status(400).json({ success: false, message: "Prompt required" });
-        // }
+        // console.log(data.brandKit.colors);
+        // return res.status(200).json({ success: true, message: "Data received" });
 
-        console.log(req.body);
-        // return true;
-
-        // Process logos concurrently
         const processedLogos = await Promise.all(
-            brandLogos.slice(0, 2).map(async (logo) => {
+            data.brandKit.logos.slice(0, 2).map(async (logo) => {
                 if (!logo?.url) return null;
                 try {
                     const file = await uploadUrlImageToGemini(logo.url);
-                    return { uri: file.uri, mimeType: file.mimeType };
+                    console.log(file);
+                    return { fileData: { fileUri: file.uri, mimeType: file.mimeType } };
                 } catch (e) {
                     console.error("Logo upload failed:", e);
                     return null;
@@ -83,34 +34,40 @@ export const generateImage = async (req, res) => {
             })
         );
 
+        const refs = data.references.images.filter(item => item.uri && item.mimeType)
+            .map(item => ({
+                fileData: {
+                    fileUri: item.uri,
+                    mimeType: item.mimeType
+                }
+            }));
 
-        // merge references (max 4)
-        const refs = [
-            ...referenceImages,
-            ...processedLogos.filter(Boolean)
-        ].slice(0, 4);
+        // console.log("refs", refs);
 
-        const finalPrompt = buildPrompt({
-            selectedToneId,
-            text: prompt,
-            brand: brandData,
-        });
+        // console.log("processedLogos", processedLogos);
+        // console.log("systemInstruction: ", imagePrompts[hand_drawn_2_prompt]);
+        const systemInstruction = visualToneSystemInstructions[data.visualStyle.toneId] || systemInstructionModern;
+        console.log("systemInstruction used: ", data.visualStyle.toneId);
 
-        const optimizedFinalPrompt = buildImageParts(refs, finalPrompt);
-
-        console.log(optimizedFinalPrompt);
         // return;
+        // return;
+        const userInstruction = buildUserPrompt(data, JSON.stringify(processedLogos), "");
 
         const response = await genAI.models.generateContent({
             model: "gemini-3-pro-image-preview",
+            systemInstruction,
             contents: {
                 role: "user",
-                parts: optimizedFinalPrompt,
+                parts: [
+                    { text: userInstruction },
+                    ...processedLogos,
+                    ...refs
+                ]
             },
             config: {
                 imageConfig: {
-                    aspectRatio,
-                    resolution: "2K",
+                    aspectRatio: data.aspectRatio,
+                    resolution: "4K",
                 },
             },
         });
@@ -142,11 +99,13 @@ export const generateImage = async (req, res) => {
         console.log("uploaded", {
             success: true,
             imageUrl: uploaded.secure_url,
+            timeTaken: (Date.now() - timestamp) / 1000 + " sec",
             // meta: uploaded,
         });
         return res.status(200).json({
             success: true,
             imageUrl: uploaded.secure_url,
+            timeTaken: (Date.now() - timestamp) / 1000 + "sec",
             meta: uploaded,
         });
     } catch (err) {
