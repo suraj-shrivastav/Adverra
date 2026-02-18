@@ -34,7 +34,7 @@ const BrandSidebar = ({
     };
 
     return (
-        <div className="w-[420px] border-r border-white/5 flex flex-col p-10 gap-8 shrink-0 h-full overflow-y-auto scrollbar-hide bg-[#050505] font-outfit">
+        <div className="w-[85vw] sm:w-[320px] lg:w-[420px] border-r border-white/5 flex flex-col p-6 sm:p-8 lg:p-10 gap-6 sm:gap-8 shrink-0 h-full overflow-y-auto scrollbar-hide bg-[#050505] font-outfit">
             <div className="space-y-2">
                 <h1 className="text-3xl font-black text-white tracking-tighter font-space">
                     {title}

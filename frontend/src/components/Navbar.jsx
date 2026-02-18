@@ -92,7 +92,7 @@ const Navbar = () => {
             {/* Mobile Bottom Navigation - Visible only on mobile */}
             {user && (
                 <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 p-3 pointer-events-none">
-                    <div className="pointer-events-auto bg-black/40 backdrop-blur-3xl border border-white/10 rounded-3xl shadow-2xl p-1">
+                    <div className="pointer-events-auto bg-black rounded-3xl shadow-2xl p-1">
                         <div className="flex items-center justify-around gap-1">
                             {navLinks.map((link) => {
                                 const isActive = location.pathname === link.path;

@@ -1,5 +1,6 @@
-import { Mic, Users, Sliders, Package, Target, Clock, Globe, Volume2, Music, Headphones, Radio, Waves, ChevronDown, Check, Download, Play, X, History, Calendar, Loader2, Sliders as SlidersIcon, Volume2 as VolumeIcon, Download as DownloadIcon, Play as PlayIcon, Megaphone } from "lucide-react";
-import { useState, useEffect } from "react";
+import { Mic, Users, Sliders, Package, Target, Clock, Globe, Volume2, AudioLines, Headphones, Radio, Waves, ChevronDown, Check, Download, Play, X, History, Calendar, Loader2, Sliders as SlidersIcon, Volume2 as VolumeIcon, Download as DownloadIcon, Play as PlayIcon, Megaphone } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { api } from "../libs/api.js"
 import { useDataStore } from "../store/useDataStore.js";
 import HistoryModal from "../components/common/HistoryModal";
@@ -147,14 +148,36 @@ export default function AudioPage() {
                                     />
 
                                     {speakerMode === "Single Speaker" ? (
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-black/60 border border-white/10 rounded-2xl p-4">
-                                            <Input name="speakerName" label="Speaker Name" placeholder="Narrator" />
-                                            <ModernSelect
-                                                name="language"
-                                                label="Language"
-                                                onAnyChange={() => setHasAnyData(true)}
-                                                options={["English (US)", "English (UK)", "French", "German", "Spanish", "Japanese"]}
-                                            />
+                                        <div className="space-y-4 bg-black/60 border border-white/10 rounded-2xl p-4">
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                <Input name="speakerName" label="Speaker Name" placeholder="Narrator" />
+                                                <Input name="speakerTone" label="Voice Tone" placeholder="confident, warm" />
+                                            </div>
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                <ModernSelect
+                                                    name="voice"
+                                                    label="Voice"
+                                                    onAnyChange={() => setHasAnyData(true)}
+                                                    options={[
+                                                        "Zephyr — Bright",
+                                                        "Puck — Upbeat",
+                                                        "Charon — Informative",
+                                                        "Kore — Firm",
+                                                        "Fenrir — Excitable",
+                                                        "Leda — Youthful",
+                                                        "Orus — Firm",
+                                                        "Aoede — Breezy",
+                                                        "Callirrhoe — Easy-going",
+                                                        "Autonoe — Bright"
+                                                    ]}
+                                                />
+                                                <ModernSelect
+                                                    name="language"
+                                                    label="Language"
+                                                    onAnyChange={() => setHasAnyData(true)}
+                                                    options={["English (US)", "English (UK)", "French", "German", "Spanish", "Japanese"]}
+                                                />
+                                            </div>
                                         </div>
                                     ) : (
                                         <div className="space-y-3 overflow-y-auto max-h-[350px] pr-2 scrollbar-hide">
@@ -162,10 +185,13 @@ export default function AudioPage() {
                                                 <div className="text-xs font-bold text-gray-400 uppercase tracking-widest">Speaker 1</div>
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                                     <Input name="speaker1Name" label="Name" placeholder="Alex" />
-                                                    <Input name="speaker1Tone" label="Tone" placeholder="confident" />
+                                                    <Input name="speaker1Tone" label="Voice Tone" placeholder="confident" />
                                                 </div>
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                    <ModernSelect name="speaker1Voice" label="Voice" options={["Zephyr — Bright", "Puck — Upbeat", "Charon — Informative", "Kore — Firm", "Fenrir — Excitable", "Leda — Youthful", "Orus — Firm", "Aoede — Breezy", "Callirrhoe — Easy-going", "Autonoe — Bright"]} onAnyChange={() => setHasAnyData(true)} />
                                                     <ModernSelect name="speaker1Language" label="Language" options={["English (US)", "English (UK)", "French"]} onAnyChange={() => setHasAnyData(true)} />
+                                                </div>
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                                     <ModernSelect name="speaker1Role" label="Role" options={["Host", "Expert", "Customer", "Narrator"]} onAnyChange={() => setHasAnyData(true)} />
                                                 </div>
                                             </div>
@@ -173,10 +199,13 @@ export default function AudioPage() {
                                                 <div className="text-xs font-bold text-gray-400 uppercase tracking-widest">Speaker 2</div>
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                                     <Input name="speaker2Name" label="Name" placeholder="Jordan" />
-                                                    <Input name="speaker2Tone" label="Tone" placeholder="curious" />
+                                                    <Input name="speaker2Tone" label="Voice Tone" placeholder="curious" />
                                                 </div>
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                    <ModernSelect name="speaker2Voice" label="Voice" options={["Zephyr — Bright", "Puck — Upbeat", "Charon — Informative", "Kore — Firm", "Fenrir — Excitable", "Leda — Youthful", "Orus — Firm", "Aoede — Breezy", "Callirrhoe — Easy-going", "Autonoe — Bright"]} onAnyChange={() => setHasAnyData(true)} />
                                                     <ModernSelect name="speaker2Language" label="Language" options={["English (US)", "English (UK)", "French"]} onAnyChange={() => setHasAnyData(true)} />
+                                                </div>
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                                     <ModernSelect name="speaker2Role" label="Role" options={["Host", "Expert", "Customer", "Narrator"]} onAnyChange={() => setHasAnyData(true)} />
                                                 </div>
                                             </div>
@@ -294,10 +323,32 @@ export default function AudioPage() {
                                 <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Playback</h3>
                             </div>
                             <div className="bg-black/40 border border-white/5 rounded-3xl p-8 flex-1 flex flex-col items-center justify-center space-y-8">
+                                <div className="p-4 rounded-2xl bg-white/5 border border-white/10">
+                                    <AudioLines size={60} className="text-gray-400" />
+                                </div>
                                 <audio controls className="w-full accent-white" src={item.publicUrl} />
-                                <a href={item.publicUrl} download className="flex items-center gap-2 bg-white text-black px-6 py-3 rounded-2xl text-sm font-bold w-full justify-center">
+                                <button
+                                    onClick={async () => {
+                                        try {
+                                            const response = await fetch(item.publicUrl);
+                                            const blob = await response.blob();
+                                            const url = window.URL.createObjectURL(blob);
+                                            const a = document.createElement('a');
+                                            a.href = url;
+                                            a.download = `${item.filename || 'audio'}.wav`;
+                                            document.body.appendChild(a);
+                                            a.click();
+                                            document.body.removeChild(a);
+                                            window.URL.revokeObjectURL(url);
+                                        } catch (err) {
+                                            console.error('Download failed:', err);
+                                            window.open(item.publicUrl, '_blank');
+                                        }
+                                    }}
+                                    className="flex items-center gap-2 bg-white text-black px-6 py-3 rounded-2xl text-sm font-bold w-full justify-center hover:bg-gray-200 transition-all active:scale-95"
+                                >
                                     <DownloadIcon size={18} /> Download Audio
-                                </a>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -340,6 +391,8 @@ function Textarea({ label, placeholder, rows = 3, required = false, name }) {
 function ModernSelect({ label, options, value, onChange, required = false, name, onAnyChange }) {
     const [isOpen, setIsOpen] = useState(false);
     const [selectedValue, setSelectedValue] = useState(value || options[0]);
+    const buttonRef = useRef(null);
+    const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0, width: 0 });
 
     const handleSelect = (option) => {
         setSelectedValue(option);
@@ -348,19 +401,34 @@ function ModernSelect({ label, options, value, onChange, required = false, name,
         setIsOpen(false);
     };
 
+    const handleToggle = () => {
+        if (!isOpen && buttonRef.current) {
+            const rect = buttonRef.current.getBoundingClientRect();
+            setDropdownPos({
+                top: rect.bottom + 8,
+                left: rect.left,
+                width: rect.width,
+            });
+        }
+        setIsOpen(!isOpen);
+    };
+
     return (
-        <div className="space-y-2 relative">
+        <div className="space-y-2">
             <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">{label}{required && <span className="text-gray-500 ml-1 opacity-50">*</span>}</label>
             {name && <input type="hidden" name={name} value={selectedValue} />}
             <div className="relative">
-                <button type="button" onClick={() => setIsOpen(!isOpen)} className="w-full bg-black/60 border border-white/20 hover:border-white/30 focus:border-white/40 rounded-2xl px-4 py-3 text-sm text-white outline-none transition-all flex items-center justify-between group">
+                <button ref={buttonRef} type="button" onClick={handleToggle} className="w-full bg-black/60 border border-white/20 hover:border-white/30 focus:border-white/40 rounded-2xl px-4 py-3 text-sm text-white outline-none transition-all flex items-center justify-between group">
                     <span className={selectedValue ? "text-white" : "text-gray-500"}>{selectedValue || "Select..."}</span>
                     <ChevronDown size={16} className={`text-gray-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
                 </button>
-                {isOpen && (
+                {isOpen && createPortal(
                     <>
-                        <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
-                        <div className="absolute z-20 w-full mt-2 bg-neutral-900 border border-white/30 rounded-2xl shadow-2xl overflow-hidden max-h-60 overflow-y-auto scrollbar-hide">
+                        <div className="fixed inset-0 z-[9998]" onClick={() => setIsOpen(false)} />
+                        <div
+                            className="fixed z-[9999] bg-neutral-900 border border-white/30 rounded-2xl shadow-2xl overflow-hidden max-h-60 overflow-y-auto scrollbar-hide"
+                            style={{ top: dropdownPos.top, left: dropdownPos.left, width: dropdownPos.width }}
+                        >
                             {options.map((option, index) => (
                                 <button key={option} type="button" onClick={() => handleSelect(option)} className={`w-full px-4 py-3 text-sm text-left transition-all flex items-center justify-between group ${selectedValue === option ? 'bg-white/15 text-white' : 'text-gray-300 hover:bg-white/10 hover:text-white'} ${index !== options.length - 1 ? 'border-b border-white/10' : ''}`}>
                                     <span>{option}</span>
@@ -368,7 +436,8 @@ function ModernSelect({ label, options, value, onChange, required = false, name,
                                 </button>
                             ))}
                         </div>
-                    </>
+                    </>,
+                    document.body
                 )}
             </div>
         </div>

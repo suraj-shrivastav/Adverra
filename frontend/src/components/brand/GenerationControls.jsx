@@ -1,5 +1,6 @@
 import React from 'react';
-import { Sparkles, Loader2 } from 'lucide-react';
+import { Sparkles, Loader2, Clock } from 'lucide-react';
+import { useImageGenerationStore } from '../../store/useImageGenerationStore';
 import PlatformSelector from './PlatformSelector';
 import ReferenceUploader from './ReferenceUploader';
 import VisualToneGrid from './VisualToneGrid';
@@ -27,10 +28,13 @@ const GenerationControls = ({
 
     return (
         <div className="flex-1 flex flex-col relative h-full bg-black/40">
-            <div className="flex-1 overflow-y-auto p-6 pb-32 scrollbar-hide space-y-8">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 pt-14 lg:pt-6 pb-36 sm:pb-32 scrollbar-hide space-y-6 sm:space-y-8">
+                <div className='md:hidden text-center '>
+                    <h1 className='text-3xl font-bold'>Image Generation</h1>
+                </div>
 
                 {/* 1. Platform & Aspect Ratio */}
-                <div className="grid grid-cols-2 gap-4 items-start">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-start">
                     <PlatformSelector
                         platform={formData.platform}
                         setPlatform={(val) => setFormData({ platform: val })}
@@ -44,7 +48,7 @@ const GenerationControls = ({
                 <hr className="border-white/10" />
 
                 {/* 2. Strategy: Campaign Objective & Target Audience */}
-                <div className="grid grid-cols-2 gap-6 items-start">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
 
                     {/* Campaign Objective */}
                     <div className="space-y-4">
@@ -108,7 +112,7 @@ const GenerationControls = ({
                 <hr className="border-white/10" />
 
                 {/* 3. References & Message */}
-                <div className="grid grid-cols-2 gap-6 items-start">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
 
                     {/* References & Assets */}
                     <div className="space-y-4">
@@ -160,7 +164,7 @@ const GenerationControls = ({
                 {/* 5. Visual Framework */}
                 <div className="space-y-4">
                     <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Visual Framework</h3>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <PremiumSelect
                             label="Layout"
                             value={formData.visualStyle?.layout}
@@ -195,28 +199,42 @@ const GenerationControls = ({
             </div>
 
             {/* Footer */}
-            <div className="absolute bottom-0 left-0 right-0 p-6 bg-black/90 backdrop-blur-xl border-t border-gray-900 flex justify-between items-center z-20">
+            <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 bg-black/90 backdrop-blur-xl border-t border-gray-900 flex flex-col sm:flex-row gap-4 sm:gap-0 justify-between items-stretch sm:items-center z-20">
                 <div className="flex flex-col">
                     <span className="text-[10px] uppercase tracking-[0.2em] text-gray-600 font-black font-space">Estimated Power</span>
                     <span className="text-white font-black text-xl tracking-tighter font-space">12 <span className="text-xs text-gray-500 font-medium">Credits</span></span>
                 </div>
-                <button
-                    onClick={() => handlers.onGenerate(formData)}
-                    disabled={isGenerating}
-                    className={`flex items-center gap-2 bg-white hover:bg-gray-200 text-black px-8 py-3 rounded-full font-bold transition-all shadow-lg shadow-white/5 active:scale-95 ${isGenerating ? 'opacity-70 cursor-wait' : ''}`}
-                >
-                    {isGenerating ? (
-                        <>
-                            <Loader2 size={18} className="animate-spin text-black" />
-                            <span>Generating...</span>
-                        </>
-                    ) : (
-                        <>
-                            <Sparkles size={18} className="fill-black" />
-                            <span>Generate Image</span>
-                        </>
-                    )}
-                </button>
+
+                <div className="flex items-center gap-3 sm:gap-4">
+                    <button
+                        onClick={() => {
+                            useImageGenerationStore.getState().fetchHistory();
+                            useImageGenerationStore.getState().setHistoryModalOpen(true);
+                        }}
+                        className="flex items-center gap-2 px-4 sm:px-6 py-3 rounded-full border border-white/10 hover:border-white/30 text-gray-400 hover:text-white transition-all bg-white/5 active:scale-95"
+                    >
+                        <Clock size={18} />
+                        <span className="font-bold">History</span>
+                    </button>
+
+                    <button
+                        onClick={() => handlers.onGenerate(formData)}
+                        disabled={isGenerating}
+                        className={`flex items-center justify-center gap-2 bg-white hover:bg-gray-200 text-black px-6 sm:px-8 py-3 rounded-full font-bold transition-all shadow-lg shadow-white/5 active:scale-95 flex-1 sm:flex-none ${isGenerating ? 'opacity-70 cursor-wait' : ''}`}
+                    >
+                        {isGenerating ? (
+                            <>
+                                <Loader2 size={18} className="animate-spin text-black" />
+                                <span>Generating...</span>
+                            </>
+                        ) : (
+                            <>
+                                <Sparkles size={18} className="fill-black" />
+                                <span>Generate Image</span>
+                            </>
+                        )}
+                    </button>
+                </div>
             </div>
         </div>
     );

@@ -144,15 +144,16 @@ export const uploadReferenceImage = async (req, res) => {
 
 export const getAssets = async (req, res) => {
     try {
+        console.log("Get Assets fetched");
         if (!req.user?.id) {
             return res.status(401).json({ success: false });
         }
 
         const { data, error } = await supabase
             .from("brand_assets")
-            .select("id, img_url, img_meta_data, created_at")
+            .select("id, img_url, created_at")
             .eq("userId", req.user.id)
-            .order("created_at", { ascending: false });
+            .order("created_at", { ascending: true });
 
         if (error) throw error;
 

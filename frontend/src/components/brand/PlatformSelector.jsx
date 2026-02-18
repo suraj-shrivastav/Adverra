@@ -13,7 +13,7 @@ const PlatformSelector = ({ platform, setPlatform }) => {
     return (
         <div className="space-y-3">
             <label className="text-[10px] font-black text-gray-600 uppercase tracking-[0.2em] pl-1">Platform</label>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {platforms.map((p) => (
                     <button
                         key={p.id}

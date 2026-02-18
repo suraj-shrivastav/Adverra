@@ -14,7 +14,7 @@ const AspectRatioSelector = ({ value, onChange }) => {
                 Aspect Ratio
             </label>
 
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {aspectRatios.map((ratio) => (
                     <button
                         key={ratio.id}

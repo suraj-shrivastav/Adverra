@@ -10,6 +10,7 @@ export const useImageGenerationStore = create((set, get) => ({
     brands: [],
     campaigns: [],
     assets: [],
+    historyImages: [],
 
     // ======================
     // UI STATE
@@ -21,6 +22,10 @@ export const useImageGenerationStore = create((set, get) => ({
 
     isLoadingBrands: false,
     isGenerating: false,
+    isHistoryLoading: false,
+    isHistoryModalOpen: false,
+    isResultModalOpen: false,
+    lastGeneratedImage: null,
 
     // ======================
     // STATIC CONFIG
@@ -95,6 +100,25 @@ export const useImageGenerationStore = create((set, get) => ({
 
     setNewBrandUrl: (url) => set({ newBrandUrl: url }),
     setSubmittingBrand: (val) => set({ isSubmittingBrand: val }),
+
+    // ======================
+    // HISTORY ACTIONS
+    // ======================
+    setHistoryModalOpen: (isOpen) => set({ isHistoryModalOpen: isOpen }),
+    setResultModalOpen: (isOpen) => set({ isResultModalOpen: isOpen }),
+
+    fetchHistory: async () => {
+        try {
+            set({ isHistoryLoading: true });
+            const data = await api.get("/assets");
+            // The backend returns { success: true, data: [...] } where data objects have img_url and created_at
+            set({ historyImages: data.data || [] });
+        } catch (err) {
+            console.error("fetchHistory error:", err);
+        } finally {
+            set({ isHistoryLoading: false });
+        }
+    },
 
     // ======================
     // FORM ACTIONS
@@ -322,6 +346,16 @@ export const useImageGenerationStore = create((set, get) => ({
             console.log("Generating with payload:", payload);
 
             const data = await api.post("/assets/generate", payload);
+
+            if (data?.success && data.imageUrl) {
+                set({
+                    lastGeneratedImage: data.imageUrl,
+                    isResultModalOpen: true
+                });
+                // Refresh history to include the new image
+                get().fetchHistory();
+            }
+
             return data;
         } catch (error) {
             console.error("Generation failed", error);

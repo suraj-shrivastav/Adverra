@@ -19,7 +19,7 @@ const VisualToneGrid = ({ tones, selectedToneId, onSelect, isLoading }) => {
     return (
         <div className="space-y-3">
             <label className="text-[10px] font-black text-gray-600 uppercase tracking-[0.2em] pl-1">Visual Tone</label>
-            <div className="grid grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
                 {tones.map((tone) => {
                     const isSelected = selectedToneId === tone.id;
                     return (

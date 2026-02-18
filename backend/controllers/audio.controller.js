@@ -235,9 +235,11 @@ export const generateAudio = async (req, res) => {
     try {
         const formData = req.body;
         console.log("Script: ", formData);
+        // return;
 
         // Use a default user ID if req.user is not present, matching campaign controller pattern
-        const userId = req.user?.id || "736ec2b1-9ba6-4ee9-9854-b23cd21d0061";
+        const userId = req.user?.id
+        if (!userId) throw new Error("User not found");
 
         const rawScript = await generateAudioScript(
             JSON.stringify(formData),
@@ -255,21 +257,25 @@ export const generateAudio = async (req, res) => {
 
 const generateAudioModel = async (script, formData, userId) => {
     try {
-        const finalScript = script.script_lines.map((line) => line.text).join("\n");
+        const finalScript = script.mode === "Multi Speaker"
+            ? script.script_lines.map((line) => `${line.speaker}: ${line.text}`).join("\n")
+            : script.script_lines.map((line) => line.text).join("\n");
         const audioConfig = {
             responseModalities: ['AUDIO']
         }
         if (script.mode == "Single Speaker") {
+            const voiceName = formData.voice.trim().split(/\s+/)[0];
             audioConfig.speechConfig = {
-                voiceConfig: {
-                    prebuiltVoiceConfig: {
-                        voiceName: "Kore"
-                    }
+                prebuiltVoiceConfig: {
+                    voiceName: voiceName
                 }
             }
         }
 
         if (script.mode == "Multi Speaker") {
+            const speaker1Voice = formData.speaker1Voice.trim().split(/\s+/)[0];
+            const speaker2Voice = formData.speaker2Voice.trim().split(/\s+/)[0];
+            console.log("voices are: ", speaker1Voice, " ", speaker2Voice);
             audioConfig.speechConfig = {
                 multiSpeakerVoiceConfig: {
                     speakerVoiceConfigs: [
@@ -277,7 +283,7 @@ const generateAudioModel = async (script, formData, userId) => {
                             speaker: "Speaker1",
                             voiceConfig: {
                                 prebuiltVoiceConfig: {
-                                    voiceName: "Kore"
+                                    voiceName: speaker1Voice.trim()
                                 }
                             }
                         },
@@ -285,7 +291,7 @@ const generateAudioModel = async (script, formData, userId) => {
                             speaker: "Speaker2",
                             voiceConfig: {
                                 prebuiltVoiceConfig: {
-                                    voiceName: "Puck"
+                                    voiceName: speaker2Voice.trim()
                                 }
                             }
                         }
@@ -308,7 +314,7 @@ const generateAudioModel = async (script, formData, userId) => {
             ],
             config: audioConfig
         });
-        console.log("Audio generated successfully", response);
+        // console.log("Audio generated successfully", response.candidates[0].content.parts[0]);
         const data = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
         const audioBuffer = Buffer.from(data, 'base64');
         const fileName = script.filename;
@@ -324,7 +330,7 @@ const generateAudioModel = async (script, formData, userId) => {
 
 export const getAudios = async (req, res) => {
     try {
-        const userId = "736ec2b1-9ba6-4ee9-9854-b23cd21d0061";
+        const userId = req.user?.id;
         if (!userId) {
             return res.status(403).send({ error: "Unauthorized" });
         }

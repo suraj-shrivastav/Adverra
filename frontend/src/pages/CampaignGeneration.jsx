@@ -3,7 +3,7 @@ import BrandSidebar from '../components/brand/BrandSidebar';
 import BrandModal from '../components/brand/BrandModal';
 import { useImageGenerationStore } from '../store/useImageGenerationStore';
 import { api } from '../libs/api';
-import { Loader2, Send, Copy, Check, Instagram, Twitter, Linkedin, Facebook, Pin, Globe, History, X, Calendar, Play, Megaphone } from 'lucide-react';
+import { Loader2, Send, Copy, Check, Instagram, Twitter, Linkedin, Facebook, Pin, Globe, History, X, Calendar, Play, Megaphone, Menu } from 'lucide-react';
 import HistoryModal from '../components/common/HistoryModal';
 
 const CampaignGeneration = () => {
@@ -36,6 +36,7 @@ const CampaignGeneration = () => {
     const [historyCampaigns, setHistoryCampaigns] = useState([]);
     const [isLoadingHistory, setIsLoadingHistory] = useState(false);
     const [selectedHistoryItem, setSelectedHistoryItem] = useState(null);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     const selectedBrand = brands.find(b => b.id == selectedBrandId);
 
@@ -49,6 +50,7 @@ const CampaignGeneration = () => {
             openBrandModal();
         } else {
             setSelectedBrandId(value);
+            setIsSidebarOpen(false);
         }
     };
 
@@ -140,9 +142,9 @@ const CampaignGeneration = () => {
     const CampaignDetailView = ({ campaign, createdAt, onClose }) => (
         <div className="h-full flex flex-col">
             {/* Header */}
-            <div className="flex items-start justify-between mb-8 flex-shrink-0">
+            <div className="flex items-start justify-between mb-4 sm:mb-8 flex-shrink-0">
                 <div className="flex-1 pr-4">
-                    <h3 className="text-3xl font-bold text-white mb-2 leading-tight">{campaign.title}</h3>
+                    <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-2 leading-tight">{campaign.title}</h3>
                     {createdAt && (
                         <div className="flex items-center gap-2 text-xs text-gray-600">
                             <Calendar size={14} />
@@ -161,9 +163,9 @@ const CampaignGeneration = () => {
             </div>
 
             {/* Content Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 min-h-0">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 flex-1 min-h-0">
                 {/* Main Campaign Text */}
-                <div className="lg:col-span-2 bg-black/30 rounded-3xl p-8 border border-white/5 hover:border-white/10 transition-all flex flex-col">
+                <div className="lg:col-span-2 bg-black/30 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-white/5 hover:border-white/10 transition-all flex flex-col">
                     <div className="flex items-center justify-between mb-6 flex-shrink-0">
                         <span className="text-xs font-semibold text-gray-600 uppercase tracking-wider">Campaign Copy</span>
                         <button
@@ -178,20 +180,20 @@ const CampaignGeneration = () => {
                         </button>
                     </div>
                     <div className="flex-1 overflow-y-auto pr-2 scrollbar-hide">
-                        <p className="text-base text-gray-300 whitespace-pre-line leading-relaxed">
+                        <p className="text-sm sm:text-base text-gray-300 whitespace-pre-line leading-relaxed">
                             {campaign.actualCampaign}
                         </p>
                     </div>
                 </div>
 
                 {/* Sidebar Info */}
-                <div className="space-y-4 flex flex-col">
-                    <div className="bg-black/30 rounded-3xl p-6 border border-white/5">
+                <div className="space-y-3 sm:space-y-4 flex flex-col">
+                    <div className="bg-black/30 rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-white/5">
                         <div className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-3">Target Audience</div>
                         <div className="text-sm text-gray-400 leading-relaxed">{campaign.targetAudience}</div>
                     </div>
 
-                    <div className="bg-black/30 rounded-3xl p-6 border border-white/5">
+                    <div className="bg-black/30 rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-white/5">
                         <div className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-3">Best Time</div>
                         <div className="flex items-center gap-2 text-base text-white font-medium">
                             <div className="w-1.5 h-1.5 rounded-full bg-white" />
@@ -199,7 +201,7 @@ const CampaignGeneration = () => {
                         </div>
                     </div>
 
-                    <div className="bg-black/30 rounded-3xl p-6 border border-white/5 flex-1">
+                    <div className="bg-black/30 rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-white/5 flex-1">
                         <div className="flex items-center justify-between mb-4">
                             <div className="text-xs font-semibold text-gray-600 uppercase tracking-wider">Hashtags</div>
                             <button
@@ -227,20 +229,48 @@ const CampaignGeneration = () => {
     );
 
     return (
-        <div className="flex h-full bg-black text-gray-200 overflow-hidden font-outfit">
-            <BrandSidebar
-                brands={brands}
-                selectedBrandId={selectedBrandId}
-                selectedBrandData={selectedBrand}
-                onBrandChange={handleBrandChange}
-                isLoading={isLoadingBrands}
-                title="Campaign Generation"
-                subtitle="Create AI-powered marketing campaigns"
-            />
+        <div className="flex h-full bg-black text-gray-200 overflow-hidden font-outfit relative">
+
+            {/* Mobile sidebar toggle */}
+            <button
+                onClick={() => setIsSidebarOpen(true)}
+                className="lg:hidden fixed top-4 left-4 z-40 p-2.5 bg-white/5 border border-white/10 rounded-xl text-gray-400 hover:text-white hover:bg-white/10 transition-all backdrop-blur-md"
+            >
+                <Menu size={20} />
+            </button>
+
+            {/* Sidebar overlay for mobile */}
+            {isSidebarOpen && (
+                <div
+                    className="lg:hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-40"
+                    onClick={() => setIsSidebarOpen(false)}
+                />
+            )}
+
+            {/* Sidebar wrapper */}
+            <div className={`fixed lg:relative z-50 h-full transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
+                {/* Mobile close button */}
+                <button
+                    onClick={() => setIsSidebarOpen(false)}
+                    className="lg:hidden absolute top-4 right-4 z-50 p-2 bg-white/5 border border-white/10 rounded-xl text-gray-400 hover:text-white transition-all"
+                >
+                    <X size={18} />
+                </button>
+
+                <BrandSidebar
+                    brands={brands}
+                    selectedBrandId={selectedBrandId}
+                    selectedBrandData={selectedBrand}
+                    onBrandChange={handleBrandChange}
+                    isLoading={isLoadingBrands}
+                    title="Campaign Generation"
+                    subtitle="Create AI-powered marketing campaigns"
+                />
+            </div>
 
             <div className="flex-1 flex flex-col h-full overflow-hidden relative">
                 {/* Fancy Background Text Overlay */}
-                <div className="absolute inset-0 overflow-hidden pointer-events-none select-none opacity-[0.05] z-0 font-space">
+                <div className="absolute inset-0 overflow-hidden pointer-events-none select-none opacity-[0.05] z-0 font-space hidden lg:block">
                     <div className="absolute top-[5%] -left-20 -rotate-12 text-[120px] font-black tracking-tighter whitespace-nowrap">
                         STRATEGY → EXECUTION
                     </div>
@@ -267,31 +297,31 @@ const CampaignGeneration = () => {
                     </div>
                 </div>
                 {/* History Button */}
-                <div className="absolute top-8 right-8 z-10">
+                <div className="absolute top-4 right-4 lg:top-8 lg:right-8 z-10">
                     <button
                         onClick={fetchHistory}
-                        className="flex items-center gap-2 px-5 py-2.5 bg-black/40 border border-white/10 rounded-2xl text-xs font-semibold text-gray-400 hover:text-white hover:bg-black/60 transition-all"
+                        className="flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 bg-black/40 border border-white/10 rounded-2xl text-xs font-semibold text-gray-400 hover:text-white hover:bg-black/60 transition-all"
                     >
                         <History size={16} />
-                        History
+                        <span className="hidden sm:inline">History</span>
                     </button>
                 </div>
 
                 {/* Main Form */}
-                <div className="flex-1 flex items-center justify-center p-8 overflow-y-auto scrollbar-hide">
-                    <div className="max-w-3xl w-full space-y-12">
-                        <div className="text-center space-y-3">
-                            <h1 className="text-5xl font-bold text-white tracking-tight">
+                <div className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8 pt-14 lg:pt-8 overflow-y-auto scrollbar-hide">
+                    <div className="max-w-3xl w-full space-y-8 sm:space-y-12">
+                        <div className="text-center space-y-2 sm:space-y-3">
+                            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight">
                                 Campaign Hub
                             </h1>
-                            <p className="text-gray-600 text-base">Create execution-ready social posts from your brand brief</p>
+                            <p className="text-gray-600 text-sm sm:text-base">Create execution-ready social posts from your brand brief</p>
                         </div>
 
-                        <div className="bg-black/20 border border-white/10 rounded-[2.5rem] p-8 space-y-8 backdrop-blur-sm">
+                        <div className="bg-black/20 border border-white/10 rounded-3xl sm:rounded-[2.5rem] p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8 backdrop-blur-sm">
                             {/* Platforms */}
-                            <div className="space-y-4">
+                            <div className="space-y-3 sm:space-y-4">
                                 <label className="text-xs font-semibold text-gray-600 uppercase tracking-wider">Platforms</label>
-                                <div className="flex flex-wrap gap-3">
+                                <div className="flex flex-wrap gap-2 sm:gap-3">
                                     {[
                                         { id: 'Instagram', icon: Instagram },
                                         { id: 'Twitter', icon: Twitter },
@@ -311,13 +341,13 @@ const CampaignGeneration = () => {
                                                         setPlatforms([...platforms, p.id]);
                                                     }
                                                 }}
-                                                className={`flex items-center gap-2.5 px-5 py-2.5 rounded-2xl border transition-all ${isSelected
+                                                className={`flex items-center gap-2 sm:gap-2.5 px-3 sm:px-5 py-2 sm:py-2.5 rounded-2xl border transition-all ${isSelected
                                                     ? 'bg-white text-black border-white'
                                                     : 'bg-black/30 border-white/10 text-gray-500 hover:border-white/20 hover:text-gray-400'
                                                     }`}
                                             >
                                                 <p.icon size={16} />
-                                                <span className="text-sm font-bold">{p.id}</span>
+                                                <span className="text-xs sm:text-sm font-bold">{p.id}</span>
                                             </button>
                                         );
                                     })}
@@ -325,7 +355,7 @@ const CampaignGeneration = () => {
                             </div>
 
                             {/* Input Fields */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4">
                                 <div className="space-y-2">
                                     <label className="text-xs font-semibold text-gray-600 uppercase tracking-wider">Product</label>
                                     <input
@@ -364,13 +394,13 @@ const CampaignGeneration = () => {
                                     value={prompt}
                                     onChange={(e) => setPrompt(e.target.value)}
                                     placeholder="Describe your campaign goals and key messaging..."
-                                    className="w-full h-44 bg-black/30 border border-white/10 hover:border-white/20 focus:border-white/30 rounded-3xl p-6 text-base text-white placeholder:text-gray-700 outline-none resize-none transition-all"
+                                    className="w-full h-36 sm:h-44 bg-black/30 border border-white/10 hover:border-white/20 focus:border-white/30 rounded-2xl sm:rounded-3xl p-4 sm:p-6 text-sm sm:text-base text-white placeholder:text-gray-700 outline-none resize-none transition-all"
                                 />
-                                <div className="absolute bottom-5 right-5">
+                                <div className="absolute bottom-4 sm:bottom-5 right-4 sm:right-5">
                                     <button
                                         onClick={handleGenerate}
                                         disabled={isGenerating}
-                                        className="bg-white text-black px-6 py-3 rounded-2xl text-sm font-semibold hover:bg-gray-200 disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-2 transition-all"
+                                        className="bg-white text-black px-4 sm:px-6 py-2.5 sm:py-3 rounded-2xl text-xs sm:text-sm font-semibold hover:bg-gray-200 disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-2 transition-all"
                                     >
                                         {isGenerating ? (
                                             <>
@@ -393,16 +423,16 @@ const CampaignGeneration = () => {
 
             {/* Result Modal */}
             {showResultModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/95 backdrop-blur-xl">
-                    <div className="bg-neutral-950 border border-white/10 rounded-[2.5rem] w-full max-w-6xl h-[85vh] overflow-hidden shadow-2xl">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/95 backdrop-blur-xl">
+                    <div className="bg-neutral-950 border border-white/10 rounded-2xl sm:rounded-[2.5rem] w-full max-w-6xl h-[90vh] sm:h-[85vh] overflow-hidden shadow-2xl">
                         <div className="h-full overflow-y-auto scrollbar-hide">
-                            <div className="p-10 h-full flex flex-col">
-                                <div className="mb-8 flex-shrink-0">
-                                    <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full mb-4">
+                            <div className="p-4 sm:p-6 lg:p-10 h-full flex flex-col">
+                                <div className="mb-4 sm:mb-8 flex-shrink-0">
+                                    <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full mb-3 sm:mb-4">
                                         <div className="w-2 h-2 rounded-full bg-white" />
                                         <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Generated</span>
                                     </div>
-                                    <h2 className="text-4xl font-bold text-white">Your Campaign</h2>
+                                    <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">Your Campaign</h2>
                                 </div>
                                 <CampaignDetailView
                                     campaign={generatedCampaign}
@@ -430,9 +460,9 @@ const CampaignGeneration = () => {
                 title="Campaign History"
                 emptyMessage="No campaigns yet.\nCreate your first one to get started."
                 renderListItem={(item) => (
-                    <button className="w-full bg-black/30 hover:bg-black/50 border border-white/5 hover:border-white/10 p-6 rounded-3xl text-left transition-all group flex items-center justify-between">
+                    <button className="w-full bg-black/30 hover:bg-black/50 border border-white/5 hover:border-white/10 p-4 sm:p-6 rounded-2xl sm:rounded-3xl text-left transition-all group flex items-center justify-between">
                         <div>
-                            <h4 className="text-lg font-semibold text-gray-400 group-hover:text-white mb-2 transition-colors">
+                            <h4 className="text-base sm:text-lg font-semibold text-gray-400 group-hover:text-white mb-2 transition-colors">
                                 {item.campaign?.title || "Untitled Campaign"}
                             </h4>
                             <div className="flex items-center gap-2 text-xs text-gray-600">
