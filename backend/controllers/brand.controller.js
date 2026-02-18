@@ -35,7 +35,7 @@ export const extractBrandData = async (req, res) => {
 
         if (error) throw error;
 
-        console.log("Brand data extracted successfully", response.data.brand);
+        // console.log("Brand data extracted successfully", response.data.brand);
 
         return res.status(200).json({
             message: "Brand data extracted successfully",
@@ -97,7 +97,7 @@ export const getAllBrandData = async (req, res) => {
         // .eq("userId", userId);
         // console.log("Brand Data: ", brandData);
 
-        console.log(newData)
+        // console.log(newData)
         if (error) throw error;
 
         if (!data || data.length === 0) {

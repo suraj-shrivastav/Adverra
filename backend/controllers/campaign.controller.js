@@ -71,7 +71,7 @@ Ensure the "actualCampaign" field contains zero explanation—only the text to b
 `;
 
         const response = await genAI.models.generateContent({
-            model: "gemini-3-flash-preview", // Updated to a stable production model
+            model: "gemini-2.5-flash", // Updated to a stable production model
             systemInstruction,
             contents: [
                 {
@@ -112,6 +112,7 @@ Ensure the "actualCampaign" field contains zero explanation—only the text to b
                         },
                     },
                 },
+                responseMimeType: "application/json",
             },
         });
 
@@ -120,7 +121,7 @@ Ensure the "actualCampaign" field contains zero explanation—only the text to b
         if (!part) {
             return res.status(500).json({ error: "Empty response from AI" });
         }
-
+        console.log("Resposnse is ", part);
         let responseText;
         try {
             responseText = part.text ? JSON.parse(part.text) : part.data;
@@ -129,6 +130,7 @@ Ensure the "actualCampaign" field contains zero explanation—only the text to b
             return res.status(500).json({ error: "AI returned invalid JSON" });
         }
 
+        console.log("Data saving started....");
         const { data, error } = await supabase
             .from("brand_campaigns")
             .insert({
@@ -138,6 +140,8 @@ Ensure the "actualCampaign" field contains zero explanation—only the text to b
             .select();
 
         if (error) throw error;
+
+        console.log("Data Saved...");
 
         return res.status(200).json(data);
     } catch (error) {

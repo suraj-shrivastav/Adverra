@@ -63,9 +63,9 @@ const LandingPage = () => {
                                 <ArrowRight className="w-4 h-4" />
                             </Link>
 
-                            <button className="rounded-2xl border border-white/10 bg-white/5 px-8 py-4 text-white/60 font-semibold hover:bg-white/10 hover:text-white transition-all backdrop-blur-md active:scale-95">
+                            {/* <button className="rounded-2xl border border-white/10 bg-white/5 px-8 py-4 text-white/60 font-semibold hover:bg-white/10 hover:text-white transition-all backdrop-blur-md active:scale-95">
                                 View Demo
-                            </button>
+                            </button> */}
                         </div>
                     </div>
 

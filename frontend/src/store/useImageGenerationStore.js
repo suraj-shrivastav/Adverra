@@ -33,14 +33,14 @@ export const useImageGenerationStore = create((set, get) => ({
     visualTones: [
         // { id: "minimalist_pro_prompt", name: "Minimalist Pro" },
         // { id: "neo_minimalist_prompt", name: "Neo Minimalist" },
-        { id: "risograph_vintage_prompt", name: "Risograph Vintage" },
+        // { id: "risograph_vintage_prompt", name: "Risograph Vintage" },
         { id: "claymorphism_prompt", name: "Claymorphism" },
         { id: "retro_cel_shaded_prompt", name: "Retro Cel Shaded" },
         { id: "cyber_organic_prompt", name: "Cyber Organic" },
         { id: "hand_drawn_prompt", name: "Hand Drawn" },
-        { id: "hand_drawn_2_prompt", name: "Hand Drawn 2" },
+        // { id: "hand_drawn_2_prompt", name: "Hand Drawn 2" },
         { id: "three_d_prompt", name: "3D" },
-        { id: "saas_glass_prompt", name: "Saas Glass" },
+        { id: "hyper_realistic_prompt", name: "Hyper Realistic" },
     ],
 
     // ======================

@@ -17,6 +17,7 @@ export const generateImage = async (req, res) => {
 
         const data = req.body;
 
+        console.log(data);
         // console.log(data.brandKit.colors);
         // return res.status(200).json({ success: true, message: "Data received" });
 

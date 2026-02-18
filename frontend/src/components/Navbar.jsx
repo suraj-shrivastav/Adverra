@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutGrid, Image as ImageIcon, Megaphone, AudioLines, LogOut, User, Zap } from 'lucide-react';
+import { Image as ImageIcon, Megaphone, AudioLines, LogOut, User, Zap } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const Navbar = () => {
@@ -29,8 +29,8 @@ const Navbar = () => {
                     {/* Left: Logo */}
                     <div className="flex-shrink-0 flex justify-start">
                         <Link to="/" className="flex items-center gap-2 sm:gap-3 group">
-                            <div className="w-7 h-7 sm:w-8 sm:h-8 bg-white/10 rounded-xl flex items-center justify-center border border-white/10 group-hover:border-white/20 transition-all">
-                                <LayoutGrid size={16} className="sm:w-[18px] sm:h-[18px] text-white" />
+                            <div className="w-10 h-10 sm:w-10 sm:h-10 bg-white/10 rounded-xl flex items-center justify-center group-hover:border-white/20 transition-all overflow-hidden">
+                                <img src="/adverra.jpg" alt="Adverra Logo" className="w-full h-full object-cover" />
                             </div>
                             <span className="text-lg sm:text-xl font-black text-white tracking-tighter font-space uppercase">Adverra</span>
                         </Link>
