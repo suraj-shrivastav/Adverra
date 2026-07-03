@@ -1,5 +1,5 @@
 import axios from "axios";
-import { supabase } from "./supabaseClient";
+import { supabase, AUTH_ENABLED } from "./supabaseClient";
 
 const API_BASE_URL = import.meta.env.VITE_BACKEND_URL
 
@@ -16,12 +16,14 @@ export const api = axios.create({
     },
 });
 
-// Request Interceptor: Attach Supabase JWT to every request
+// Request Interceptor: Attach Supabase JWT only when auth is enabled
 api.interceptors.request.use(async (config) => {
-    const { data: { session } } = await supabase.auth.getSession();
+    if (AUTH_ENABLED && supabase) {
+        const { data: { session } } = await supabase.auth.getSession();
 
-    if (session?.access_token) {
-        config.headers.Authorization = `Bearer ${session.access_token}`;
+        if (session?.access_token) {
+            config.headers.Authorization = `Bearer ${session.access_token}`;
+        }
     }
 
     return config;

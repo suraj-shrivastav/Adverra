@@ -11,7 +11,8 @@ import Navbar from "./components/Navbar";
 import AudioPage from "./pages/AudioPage";
 
 const ProtectedRoute = ({ children }) => {
-  const { user, session } = useAuth();
+  const { user, authEnabled } = useAuth();
+  if (!authEnabled) return children;
   if (!user) {
     return <Navigate to="/login" />;
   }
