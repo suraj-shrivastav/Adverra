@@ -1,12 +1,10 @@
 import axios from "axios";
 import { supabase, AUTH_ENABLED } from "./supabaseClient";
 
-const API_BASE_URL = import.meta.env.VITE_BACKEND_URL
+const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || "/api";
 
-if (API_BASE_URL) {
+if (import.meta.env.VITE_BACKEND_URL) {
     console.log("Base URL is: ", API_BASE_URL)
-} else {
-    console.warn("No VITE_BACKEND_URL found in .env, using default.");
 }
 
 export const api = axios.create({

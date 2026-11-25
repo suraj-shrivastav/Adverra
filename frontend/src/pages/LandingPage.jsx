@@ -1,7 +1,7 @@
 import CardSwap, { Card } from "../components/CardSwap";
 import { Image, Megaphone, AudioLines, ArrowRight } from "lucide-react";
 import Navbar from "../components/Navbar";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const features = [
     {
@@ -24,7 +24,11 @@ const features = [
     }
 ];
 
+const featureRoutes = ["/image", "/campaign", "/audio"];
+
 const LandingPage = () => {
+    const navigate = useNavigate();
+
     return (
         <div className="relative min-h-screen w-full bg-black text-white overflow-y-auto scrollbar-hide font-outfit">
             <Navbar />
@@ -81,11 +85,12 @@ const LandingPage = () => {
                                     pauseOnHover={false}
                                     width={500}
                                     height={400}
+                                    onCardClick={(index) => navigate(featureRoutes[index] || "/image")}
                                 >
                                     {features.map((feature, index) => (
                                         <Card
                                             key={index}
-                                            className="bg-gradient-to-br from-neutral-900 to-black border border-white/10 backdrop-blur-xl shadow-2xl rounded-[2.5rem]"
+                                            className="cursor-pointer bg-gradient-to-br from-neutral-900 to-black border border-white/10 backdrop-blur-xl shadow-2xl rounded-[2.5rem]"
                                         >
                                             <div className="flex h-full flex-col justify-between p-10">
                                                 <div>
@@ -112,13 +117,13 @@ const LandingPage = () => {
                         {/* Mobile Feature List (Alternative to CardSwap) */}
                         <div className="lg:hidden grid grid-cols-1 gap-6">
                             {features.map((feature, index) => (
-                                <div key={index} className="bg-neutral-900/50 border border-white/5 p-8 rounded-3xl backdrop-blur-sm">
+                                <Link key={index} to={featureRoutes[index] || "/image"} className="block bg-neutral-900/50 border border-white/5 p-8 rounded-3xl backdrop-blur-sm hover:border-white/20 transition-all">
                                     <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-white/70">
                                         <feature.icon size={24} />
                                     </div>
                                     <h3 className="text-xl font-bold text-white mb-2">{feature.title}</h3>
                                     <p className="text-white/50 text-sm leading-relaxed">{feature.description}</p>
-                                </div>
+                                </Link>
                             ))}
                         </div>
                     </div>

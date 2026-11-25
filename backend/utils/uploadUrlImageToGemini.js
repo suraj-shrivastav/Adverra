@@ -1,13 +1,8 @@
-import { GoogleAIFileManager } from "@google/generative-ai/server";
+import genAI, { GEMINI_ENABLED } from "../config/gemini.js";
 import { imageUrlToBase64 } from "./imageUrlToBase64.js";
 import fs from "fs";
 import path from "path";
 import os from "os";
-import dotenv from "dotenv";
-
-dotenv.config();
-
-const fileManager = new GoogleAIFileManager(process.env.GEMINI_API_KEY);
 
 /**
  * Downloads an image from URL and uploads it to Gemini
@@ -16,6 +11,10 @@ const fileManager = new GoogleAIFileManager(process.env.GEMINI_API_KEY);
  */
 export const uploadUrlImageToGemini = async (imageUrl) => {
     try {
+        if (!GEMINI_ENABLED || !genAI) {
+            throw new Error("GEMINI_API_KEY is not configured");
+        }
+
         // Get base64 and mimeType from URL
         const { data: base64Data, mimeType } = await imageUrlToBase64(imageUrl);
 
@@ -27,21 +26,24 @@ export const uploadUrlImageToGemini = async (imageUrl) => {
         const buffer = Buffer.from(base64Data, 'base64');
         fs.writeFileSync(tempFilePath, buffer);
 
-        // Upload to Gemini
-        const uploadResponse = await fileManager.uploadFile(tempFilePath, {
-            mimeType: mimeType,
-            displayName: fileName,
+        // Upload to Gemini using @google/genai
+        const uploadResponse = await genAI.files.upload({
+            file: tempFilePath,
+            config: {
+                mimeType,
+                displayName: fileName,
+            },
         });
 
         // Clean up temp file
         fs.unlinkSync(tempFilePath);
 
-        console.log(`Uploaded URL image to Gemini: ${uploadResponse.file.uri}`);
+        console.log(`Uploaded URL image to Gemini: ${uploadResponse.uri}`);
 
         return {
-            uri: uploadResponse.file.uri,
-            mimeType: uploadResponse.file.mimeType,
-            name: uploadResponse.file.name,
+            uri: uploadResponse.uri,
+            mimeType: uploadResponse.mimeType,
+            name: uploadResponse.name,
         };
     } catch (error) {
         console.error("Error uploading URL image to Gemini:", error);

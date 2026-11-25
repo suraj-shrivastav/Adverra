@@ -12,7 +12,7 @@ const Navbar = () => {
     const handleLogout = async () => {
         setIsProfileOpen(false);
         await logout();
-        navigate('/login');
+        navigate('/');
     };
 
     const navLinks = [

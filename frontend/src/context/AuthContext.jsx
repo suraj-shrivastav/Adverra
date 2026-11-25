@@ -1,88 +1,43 @@
-import { useState, useEffect, createContext, useContext } from "react";
-import { supabase, AUTH_ENABLED } from "../libs/supabaseClient";
+import { createContext, useContext } from "react";
 
 const AuthContext = createContext({});
 
-const MOCK_USER = {
-    id: "local-dev-user",
-    email: "dev@adverra.local",
-    user_metadata: { name: "Dev User" },
+const SHOWCASE_USER = {
+    id: "showcase-user",
+    email: "showcase@adverra.ai",
+    user_metadata: { name: "Adverra Showcase" },
 };
 
-const MOCK_SESSION = { access_token: "no-auth" };
+const SHOWCASE_SESSION = { access_token: "showcase-mode" };
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(AUTH_ENABLED ? null : MOCK_USER);
-    const [session, setSession] = useState(AUTH_ENABLED ? null : MOCK_SESSION);
-    const [loading, setLoading] = useState(AUTH_ENABLED);
+    const signUp = async () => ({
+        data: { user: SHOWCASE_USER, session: SHOWCASE_SESSION },
+        error: null,
+    });
 
-    useEffect(() => {
-        if (!AUTH_ENABLED) return;
+    const signIn = async () => ({
+        data: { user: SHOWCASE_USER, session: SHOWCASE_SESSION },
+        error: null,
+    });
 
-        const setData = async () => {
-            const {
-                data: { session },
-                error,
-            } = await supabase.auth.getSession();
-
-            if (error) throw error;
-
-            setSession(session);
-            setUser(session?.user ?? null);
-            setLoading(false);
-        };
-
-        const { data: listener } = supabase.auth.onAuthStateChange(
-            (_event, session) => {
-                setSession(session);
-                setUser(session?.user ?? null);
-                setLoading(false);
-            }
-        );
-
-        setData();
-
-        return () => {
-            listener?.subscription.unsubscribe();
-        };
-    }, []);
-
-    const signUp = async (data) => {
-        if (!AUTH_ENABLED) return { data: { user: MOCK_USER }, error: null };
-        const { data: authData, error: authError } =
-            await supabase.auth.signUp({
-                email: data.email,
-                password: data.password,
-            });
-        return { data: authData, error: authError };
-    };
-
-    const signIn = async (data) => {
-        if (!AUTH_ENABLED) return { data: { user: MOCK_USER, session: MOCK_SESSION }, error: null };
-        const { data: authData, error: authError } =
-            await supabase.auth.signInWithPassword(data);
-        return { data: authData, error: authError };
-    };
-
-    const logout = async () => {
-        if (!AUTH_ENABLED) return;
-        return await supabase.auth.signOut();
-    };
+    const logout = async () => ({ error: null });
 
     const value = {
         signIn,
         logout,
         signUp,
-        user,
-        session,
-        authEnabled: AUTH_ENABLED,
+        user: SHOWCASE_USER,
+        session: SHOWCASE_SESSION,
+        authEnabled: false,
     };
 
     return (
         <AuthContext.Provider value={value}>
-            {!loading && children}
+            {children}
         </AuthContext.Provider>
     );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => useContext(AuthContext);

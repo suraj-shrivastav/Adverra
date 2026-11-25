@@ -1,4 +1,4 @@
-import genAI from "../config/gemini.js"
+import genAI, { GEMINI_ENABLED } from "../config/gemini.js"
 import { supabase } from "../config/supabase.js";
 
 const createWavHeader = (dataSize, channels = 1, sampleRate = 24000, bitDepth = 16) => {
@@ -237,9 +237,12 @@ export const generateAudio = async (req, res) => {
         console.log("Script: ", formData);
         // return;
 
-        // Use a default user ID if req.user is not present, matching campaign controller pattern
         const userId = req.user?.id
         if (!userId) throw new Error("User not found");
+
+        if (!GEMINI_ENABLED || !genAI) {
+            return res.status(503).send({ error: "GEMINI_API_KEY is not configured" });
+        }
 
         const rawScript = await generateAudioScript(
             JSON.stringify(formData),

@@ -1,8 +1,15 @@
-import { supabase } from '../config/supabase.js';
-
+import { supabase, SUPABASE_ENABLED } from '../config/supabase.js';
 
 export async function authenticateUser(req, res, next) {
   try {
+    if (!SUPABASE_ENABLED) {
+      req.user = {
+        id: 'local-dev-user',
+        email: 'dev@adverra.local',
+      };
+      return next();
+    }
+
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {

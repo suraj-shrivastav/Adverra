@@ -35,7 +35,7 @@ const VisualToneGrid = ({ tones, selectedToneId, onSelect, isLoading }) => {
               `}
                         >
                             <img
-                                src={tone.id + ".jpg"}
+                                src={`/${tone.id}.jpg`}
                                 alt={tone.name}
                                 className="w-full h-full object-cover"
                             />

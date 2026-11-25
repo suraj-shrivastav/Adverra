@@ -1,0 +1,8 @@
+{
+  "name": "Adverra",
+  "description": "AI-Powered Marketing Asset Generation Platform for creating brand-aligned images, audio ads, and campaign copy.",
+  "requestFramePermissions": [],
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

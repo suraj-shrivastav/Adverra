@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { ChevronDown, Check, Plus } from 'lucide-react';
 import BrandCard from './BrandCard';
 
@@ -11,7 +10,6 @@ const BrandSidebar = ({
     title = "Generation Hub",
     subtitle = "Initialize your brand's creative assets."
 }) => {
-    const navigate = useNavigate();
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);
 

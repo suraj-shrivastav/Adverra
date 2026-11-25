@@ -34,14 +34,13 @@ const ImageGeneration = () => {
         openBrandModal,
         closeBrandModal,
         setNewBrandUrl,
-        setSubmittingBrand,
+        addBrandFromUrl,
         updateFormData,
         addUploadedImages,
         removeUploadedImage,
         handleAssetsGeneration,
         setHistoryModalOpen,
         setResultModalOpen,
-        fetchHistory,
     } = useImageGenerationStore();
 
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -67,18 +66,8 @@ const ImageGeneration = () => {
     };
 
     const handleAddBrandSubmit = async () => {
-        try {
-            setSubmittingBrand(true);
-
-            // TODO: replace with real API call
-            await new Promise((res) => setTimeout(res, 1000));
-
-            setNewBrandUrl('');
-            closeBrandModal();
-            await getAllBrands();
-        } finally {
-            setSubmittingBrand(false);
-        }
+        if (!newBrandUrl.trim()) return;
+        await addBrandFromUrl(newBrandUrl);
     };
 
     const handleImageUpload = (e) => {

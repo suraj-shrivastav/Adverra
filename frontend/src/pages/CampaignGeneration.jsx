@@ -2,14 +2,14 @@ import { useEffect, useState } from 'react';
 import BrandSidebar from '../components/brand/BrandSidebar';
 import BrandModal from '../components/brand/BrandModal';
 import { useImageGenerationStore } from '../store/useImageGenerationStore';
-import { api } from '../libs/api';
-import { Loader2, Send, Copy, Check, Instagram, Twitter, Linkedin, Facebook, Pin, Globe, History, X, Calendar, Play, Megaphone, Menu } from 'lucide-react';
+import { useDataStore } from '../store/useDataStore';
+import { buildMockCampaign } from '../libs/showcaseGenerators';
+import { Loader2, Send, Copy, Check, Instagram, Twitter, Linkedin, Facebook, Pin, Globe, History, X, Calendar, Megaphone, Menu } from 'lucide-react';
 import HistoryModal from '../components/common/HistoryModal';
 
 const CampaignGeneration = () => {
     const {
         brands,
-        getSelectedBrand,
         selectedBrandId,
         isBrandModalOpen,
         newBrandUrl,
@@ -20,8 +20,10 @@ const CampaignGeneration = () => {
         openBrandModal,
         closeBrandModal,
         setNewBrandUrl,
-        setSubmittingBrand,
+        addBrandFromUrl,
     } = useImageGenerationStore();
+
+    const { campaigns: historyCampaigns, addCampaign } = useDataStore();
 
     const [prompt, setPrompt] = useState("");
     const [platforms, setPlatforms] = useState(["Instagram"]);
@@ -33,8 +35,7 @@ const CampaignGeneration = () => {
     const [copyState, setCopyState] = useState({ type: null, active: false });
     const [showResultModal, setShowResultModal] = useState(false);
     const [showHistoryModal, setShowHistoryModal] = useState(false);
-    const [historyCampaigns, setHistoryCampaigns] = useState([]);
-    const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+    const [isLoadingHistory] = useState(false);
     const [selectedHistoryItem, setSelectedHistoryItem] = useState(null);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -55,33 +56,16 @@ const CampaignGeneration = () => {
     };
 
     const handleAddBrandSubmit = async () => {
-        try {
-            setSubmittingBrand(true);
-            await api.post('/brands/extract', { domain: newBrandUrl });
-            setNewBrandUrl('');
-            closeBrandModal();
-            await getAllBrands();
-        } finally {
-            setSubmittingBrand(false);
-        }
+        if (!newBrandUrl.trim()) return;
+        await addBrandFromUrl(newBrandUrl);
     };
 
     const fetchHistory = async () => {
-        try {
-            setIsLoadingHistory(true);
-            setShowHistoryModal(true);
-            const response = await api.get('/campaigns');
-            setHistoryCampaigns(response || []);
-        } catch (error) {
-            console.error("Failed to fetch history:", error);
-        } finally {
-            setIsLoadingHistory(false);
-        }
+        setShowHistoryModal(true);
     };
 
     const handleGenerate = async () => {
         if (!selectedBrandId) {
-            // Visual feedback if brand is missing
             const selector = document.querySelector('button[class*="border-white/20"]');
             if (selector) {
                 selector.classList.add('animate-shake');
@@ -94,36 +78,29 @@ const CampaignGeneration = () => {
             setIsGenerating(true);
             setGeneratedCampaign(null);
 
-            const payload = {
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+
+            const campaign = buildMockCampaign({
                 prompt: {
                     content: prompt,
                     product,
                     targetAudience,
-                    tone
+                    tone,
                 },
                 campaignData: {
                     platforms,
-                    ...selectedBrand
-                }
-            };
+                    ...selectedBrand,
+                },
+            });
 
-            const response = await api.post('/campaigns', payload);
+            addCampaign({
+                id: Date.now(),
+                created_at: new Date().toISOString(),
+                campaign,
+            });
 
-            let campaign = null;
-            if (Array.isArray(response) && response.length > 0) {
-                campaign = response[0].campaign;
-            } else if (response?.campaign) {
-                campaign = response.campaign;
-            } else if (response.title && response.actualCampaign) {
-                campaign = response;
-            }
-
-            if (campaign) {
-                setGeneratedCampaign(campaign);
-                setShowResultModal(true);
-            }
-        } catch (error) {
-            console.error("Campaign generation failed:", error);
+            setGeneratedCampaign(campaign);
+            setShowResultModal(true);
         } finally {
             setIsGenerating(false);
         }

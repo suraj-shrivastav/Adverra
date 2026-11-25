@@ -1,9 +1,15 @@
-import genAI from "../config/gemini.js";
+import genAI, { GEMINI_ENABLED } from "../config/gemini.js";
 import { getPlatformRules } from "../utils/platformRules.js";
 import { supabase } from "../config/supabase.js";
 
 export const createCampaign = async (req, res) => {
     try {
+        if (!GEMINI_ENABLED || !genAI) {
+            return res.status(503).json({
+                error: "GEMINI_API_KEY is not configured",
+            });
+        }
+
         const { campaignData, prompt } = req.body;
 
         if (!campaignData || !prompt) {

@@ -1,20 +1,21 @@
-import { GoogleAIFileManager } from "@google/generative-ai/server";
-import dotenv from "dotenv";
-
-dotenv.config();
-
-const fileManager = new GoogleAIFileManager(process.env.GEMINI_API_KEY);
+import genAI, { GEMINI_ENABLED } from "../config/gemini.js";
 
 export const uploadImageToGemini = async (filePath, mimeType, displayName) => {
     try {
-        const uploadResponse = await fileManager.uploadFile(filePath, {
-            mimeType: mimeType,
-            displayName: displayName,
+        if (!GEMINI_ENABLED || !genAI) {
+            throw new Error("GEMINI_API_KEY is not configured");
+        }
+
+        const uploadResponse = await genAI.files.upload({
+            file: filePath,
+            config: {
+                mimeType,
+                displayName,
+            },
         });
 
-        console.log(uploadResponse);
-        console.log(`Uploaded file ${uploadResponse.file.displayName} as: ${uploadResponse.file.uri}`);
-        return uploadResponse.file;
+        console.log(`Uploaded file ${uploadResponse.displayName} as: ${uploadResponse.uri}`);
+        return uploadResponse;
     } catch (error) {
         console.error("Error uploading file to Gemini:", error);
         throw error;

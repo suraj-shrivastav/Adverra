@@ -1,4 +1,4 @@
-import { supabase } from "../config/supabase.js";
+import { supabase, SUPABASE_ENABLED } from "../config/supabase.js";
 import axios from "axios";
 import dotenv from "dotenv";
 
@@ -10,36 +10,52 @@ const API_KEY = process.env.BRAND_DEV_API_KEY;
 export const extractBrandData = async (req, res) => {
     try {
         const { domain } = req.body;
-        console.log("domainL ", domain);
-        // return;
 
         if (!domain) {
             return res.status(400).json({ error: "Domain is required" });
         }
 
-        console.log("Extracting brand data for:", domain);
-        // return;
-        const response = await axios.get(BRAND_API_URL, {
-            params: { domain },
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${API_KEY}`,
-            },
-        });
+        let brandPayload;
+        if (API_KEY) {
+            console.log("Extracting brand data for:", domain);
+            const response = await axios.get(BRAND_API_URL, {
+                params: { domain },
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${API_KEY}`,
+                },
+            });
+            brandPayload = response.data.brand;
+        } else {
+            const cleanDomain = domain.replace(/^https?:\/\//, '').replace(/\/.*$/, '');
+            const brandName = cleanDomain.split('.')[0] || 'Brand';
+            const title = brandName.charAt(0).toUpperCase() + brandName.slice(1);
+            brandPayload = {
+                title,
+                domain: cleanDomain,
+                description: `Brand workspace initialized for ${cleanDomain}.`,
+                slogan: `${title} — Crafted for modern audiences.`,
+                logos: [],
+                colors: [
+                    { hex: '#FFFFFF', name: 'Primary Light' },
+                    { hex: '#111111', name: 'Primary Dark' },
+                ],
+                backdrops: [],
+            };
+        }
 
-        const { data, error } = await supabase.from("brand_data").insert([
+        const { error } = await supabase.from("brand_data").insert([
             {
-                brand: response.data.brand,
+                brand: brandPayload,
+                userId: req.user?.id || 'local-dev-user',
             },
         ]);
 
         if (error) throw error;
 
-        // console.log("Brand data extracted successfully", response.data.brand);
-
         return res.status(200).json({
             message: "Brand data extracted successfully",
-            data: response.data.brand,
+            data: brandPayload,
         });
     } catch (error) {
         console.error("extractBrandData error:", error?.response?.data || error);
@@ -50,8 +66,9 @@ export const extractBrandData = async (req, res) => {
 export const addCustomBrandData = async (req, res) => {
     try {
         const { data } = req.body;
+        const userId = req.user?.id || (!SUPABASE_ENABLED ? 'local-dev-user' : null);
 
-        if (!req.user?.id) {
+        if (!userId) {
             return res.status(401).json({ error: "Unauthorized" });
         }
 
@@ -64,7 +81,7 @@ export const addCustomBrandData = async (req, res) => {
             .insert([
                 {
                     brand: data,
-                    userId: req.user.id,
+                    userId,
                     created_at: new Date(),
                 },
             ]);
@@ -82,27 +99,24 @@ export const addCustomBrandData = async (req, res) => {
 
 export const getAllBrandData = async (req, res) => {
     try {
-        // const userId = req.user?.id;
-
-        // if (!userId) {
-        //     return res.status(401).json({ error: "Unauthorized" });
-        // }
-
-        console.log(req.user?.id);
         const { data, error } = await supabase
             .from("brand_data")
-            .select("*")
-        // console.log(data);
-        const newData = data.map((item) => { return { id: item.id, brand: { title: item.brand.title, description: item.brand.description, logos: item.brand.logos, colors: item.brand.colors, slogan: item.brand.slogan, backdrops: item.brand.backdrops, domain: item.brand.domain } } })
-        // .eq("userId", userId);
-        // console.log("Brand Data: ", brandData);
+            .select("*");
 
-        // console.log(newData)
         if (error) throw error;
 
-        if (!data || data.length === 0) {
-            return res.status(404).json({ message: "No brand data found" });
-        }
+        const newData = (data || []).map((item) => ({
+            id: item.id,
+            brand: {
+                title: item.brand?.title,
+                description: item.brand?.description,
+                logos: item.brand?.logos || [],
+                colors: item.brand?.colors || [],
+                slogan: item.brand?.slogan,
+                backdrops: item.brand?.backdrops || [],
+                domain: item.brand?.domain,
+            },
+        }));
 
         return res.status(200).json({ data: newData });
     } catch (error) {

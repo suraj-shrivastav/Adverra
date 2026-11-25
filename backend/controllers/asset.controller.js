@@ -1,4 +1,4 @@
-import genAI from "../config/gemini.js";
+import genAI, { GEMINI_ENABLED } from "../config/gemini.js";
 import assetPrompts from "../utils/assets.prompts.js";
 import imagePrompts from "../utils/prompts.js";
 import { uploadBase64Image } from "../config/cloudinary.js";
@@ -15,27 +15,28 @@ export const generateImage = async (req, res) => {
             return res.status(401).json({ success: false, message: "Unauthorized" });
         }
 
+        if (!GEMINI_ENABLED || !genAI) {
+            return res.status(503).json({ success: false, message: "GEMINI_API_KEY is not configured" });
+        }
+
         const data = req.body;
 
-        console.log(data);
-        // console.log(data.brandKit.colors);
-        // return res.status(200).json({ success: true, message: "Data received" });
-
-        const processedLogos = await Promise.all(
-            data.brandKit.logos.slice(0, 2).map(async (logo) => {
+        const logos = Array.isArray(data?.brandKit?.logos) ? data.brandKit.logos : [];
+        const processedLogos = (await Promise.all(
+            logos.slice(0, 2).map(async (logo) => {
                 if (!logo?.url) return null;
                 try {
                     const file = await uploadUrlImageToGemini(logo.url);
-                    console.log(file);
                     return { fileData: { fileUri: file.uri, mimeType: file.mimeType } };
                 } catch (e) {
                     console.error("Logo upload failed:", e);
                     return null;
                 }
             })
-        );
+        )).filter(Boolean);
 
-        const refs = data.references.images.filter(item => item.uri && item.mimeType)
+        const rawRefImages = Array.isArray(data?.references?.images) ? data.references.images : [];
+        const refs = rawRefImages.filter(item => item.uri && item.mimeType)
             .map(item => ({
                 fileData: {
                     fileUri: item.uri,

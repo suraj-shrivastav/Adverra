@@ -1,21 +1,17 @@
-import { Mic, Users, Sliders, Package, Target, Clock, Globe, Volume2, AudioLines, Headphones, Radio, Waves, ChevronDown, Check, Download, Play, X, History, Calendar, Loader2, Sliders as SlidersIcon, Volume2 as VolumeIcon, Download as DownloadIcon, Play as PlayIcon, Megaphone } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import { Mic, Users, Sliders, Package, Target, Clock, Volume2, AudioLines, Headphones, ChevronDown, Check, History, Calendar, Loader2, Sliders as SlidersIcon, Volume2 as VolumeIcon, Download as DownloadIcon, Play as PlayIcon } from "lucide-react";
+import { useState, useRef } from "react";
 import { createPortal } from "react-dom";
-import { api } from "../libs/api.js"
 import { useDataStore } from "../store/useDataStore.js";
+import { buildMockAudioScript, createWavBlobUrl } from "../libs/showcaseGenerators.js";
 import HistoryModal from "../components/common/HistoryModal";
 
 export default function AudioPage() {
     const [speakerMode, setSpeakerMode] = useState("Single Speaker");
-    const { audios, getAllAudios } = useDataStore();
+    const { audios, addAudio } = useDataStore();
     const [showHistoryModal, setShowHistoryModal] = useState(false);
     const [selectedHistoryItem, setSelectedHistoryItem] = useState(null);
     const [isGenerating, setIsGenerating] = useState(false);
     const [hasAnyData, setHasAnyData] = useState(false);
-
-    useEffect(() => {
-        getAllAudios();
-    }, []);
 
     const checkFormContent = (e) => {
         const form = e.currentTarget.closest('form');
@@ -33,17 +29,28 @@ export default function AudioPage() {
         setIsGenerating(true);
         const formData = new FormData(e.target);
         formData.append('speakerMode', speakerMode);
+        const formValues = Object.fromEntries(formData.entries());
 
         try {
-            const result = await api.post("/audio", formData);
-            if (result && result.id) {
-                // Open result in modal
-                setSelectedHistoryItem(result);
-                setShowHistoryModal(true);
-                getAllAudios(); // Refresh history list in background
-            }
+            await new Promise((resolve) => setTimeout(resolve, 1100));
+            const script = buildMockAudioScript(formValues);
+            const duration = Math.min(8, Math.max(4, Number(formValues.scriptDuration || 5) * 0.35));
+            const publicUrl = createWavBlobUrl(duration, speakerMode === "Multi Speaker" ? 261.63 : 220);
+
+            const result = {
+                id: Date.now(),
+                filename: script.filename,
+                publicUrl,
+                script,
+                context: formValues,
+                created_at: new Date().toISOString(),
+            };
+
+            addAudio(result);
+            setSelectedHistoryItem(result);
+            setShowHistoryModal(true);
         } catch (error) {
-            console.error('Fetch error:', error);
+            console.error('Audio showcase error:', error);
         } finally {
             setIsGenerating(false);
         }

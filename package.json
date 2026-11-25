@@ -1,0 +1,17 @@
+{
+  "name": "adverra",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "dev": "npm run build:frontend && node backend/server.js",
+    "build:frontend": "npm --workspace=frontend run build",
+    "build": "npm --workspace=frontend run build",
+    "start": "node backend/server.js",
+    "lint": "npm --workspace=frontend run lint"
+  }
+}
