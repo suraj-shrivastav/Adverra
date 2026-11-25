@@ -4,17 +4,30 @@ import {
   INITIAL_BRANDS,
   INITIAL_ASSETS,
   INITIAL_CAMPAIGNS,
+  SHOWCASE_OUTPUT_GALLERY,
+  WALKTHROUGH_PRESETS,
   createBrandFromDomain,
   selectMockAssetImage,
   buildMockCampaign,
   buildMockAudioScript,
   createSynthesizedWavBytes,
+  buildInitialAudios,
 } from './showcaseGenerators.js';
 
-test('initial seed data is populated for showcase walkthroughs', () => {
+test('initial seed data and walkthrough presets are populated for all 3 modes', () => {
   assert.ok(INITIAL_BRANDS.length >= 3);
-  assert.ok(INITIAL_ASSETS.length >= 4);
-  assert.ok(INITIAL_CAMPAIGNS.length >= 3);
+  assert.ok(INITIAL_ASSETS.length >= 5);
+  assert.ok(INITIAL_CAMPAIGNS.length >= 4);
+  assert.ok(SHOWCASE_OUTPUT_GALLERY.length >= 5);
+  assert.ok(WALKTHROUGH_PRESETS.image.outputImage.startsWith('/showcase/'));
+  assert.ok(WALKTHROUGH_PRESETS.campaign.outputCampaign.actualCampaign.length > 20);
+  assert.ok(WALKTHROUGH_PRESETS.audio.outputAudio.publicUrl.endsWith('.wav'));
+  assert.equal(WALKTHROUGH_PRESETS.audio.outputAudio.compareVariants.length, 2);
+  assert.notEqual(
+    WALKTHROUGH_PRESETS.audio.outputAudio.compareVariants[0].publicUrl,
+    WALKTHROUGH_PRESETS.audio.outputAudio.compareVariants[1].publicUrl
+  );
+  assert.ok(buildInitialAudios().every((a) => a.publicUrl.endsWith('.wav')));
 });
 
 test('createBrandFromDomain normalizes URLs and generates complete brand object', () => {
@@ -27,11 +40,11 @@ test('createBrandFromDomain normalizes URLs and generates complete brand object'
   assert.ok(brand.slogan.includes('Stripe'));
 });
 
-test('selectMockAssetImage maps toneId to local artwork or cycles fallback', () => {
-  assert.equal(selectMockAssetImage('claymorphism_prompt'), '/claymorphism_prompt.jpg');
-  assert.equal(selectMockAssetImage('three_d_prompt'), '/three_d_prompt.jpg');
-  const fallback = selectMockAssetImage(null, 2);
-  assert.ok(fallback.endsWith('.jpg'));
+test('selectMockAssetImage maps toneId to upgraded artwork or cycles gallery', () => {
+  assert.equal(selectMockAssetImage('three_d_prompt'), '/showcase/ad_lumina_3d_1795624904892.jpg');
+  assert.equal(selectMockAssetImage('claymorphism_prompt'), '/showcase/ad_sneaker_clay_1795624906489.jpg');
+  const fallback = selectMockAssetImage(null, 1);
+  assert.ok(fallback.startsWith('/showcase/'));
 });
 
 test('buildMockCampaign produces tailored copy, hashtags, and posting time', () => {

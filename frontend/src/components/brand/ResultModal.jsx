@@ -1,7 +1,8 @@
 import React from 'react';
 import { X, Download, Share2, Sparkles, Check } from 'lucide-react';
+import PipelineInspector from '../PipelineInspector';
 
-const ResultModal = ({ isOpen, onClose, imageUrl, onDownload }) => {
+const ResultModal = ({ isOpen, onClose, imageUrl, onDownload, pipelineInfo }) => {
     const [copied, setCopied] = React.useState(false);
 
     if (!isOpen || !imageUrl) return null;
@@ -39,7 +40,7 @@ const ResultModal = ({ isOpen, onClose, imageUrl, onDownload }) => {
     };
 
     return (
-        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 font-outfit">
             {/* Backdrop */}
             <div
                 className="absolute inset-0 bg-black/90 backdrop-blur-md"
@@ -47,7 +48,7 @@ const ResultModal = ({ isOpen, onClose, imageUrl, onDownload }) => {
             />
 
             {/* Modal Content */}
-            <div className="relative w-full max-w-4xl bg-[#0A0A0A] border border-white/10 rounded-[2.5rem] overflow-hidden flex flex-col shadow-2xl animate-in fade-in zoom-in duration-500">
+            <div className="relative w-full max-w-5xl max-h-[90vh] bg-[#0A0A0A] border border-white/10 rounded-[2.5rem] overflow-y-auto scrollbar-hide flex flex-col shadow-2xl animate-in fade-in zoom-in duration-500">
 
                 {/* Close Button */}
                 <button
@@ -59,8 +60,8 @@ const ResultModal = ({ isOpen, onClose, imageUrl, onDownload }) => {
 
                 <div className="flex flex-col md:flex-row h-full">
                     {/* Image Section */}
-                    <div className="flex-1 bg-neutral-900 flex items-center justify-center p-8 md:p-12 relative group">
-                        <div className="relative aspect-square w-full max-w-[500px] rounded-2xl overflow-hidden shadow-2xl border border-white/5">
+                    <div className="flex-1 bg-neutral-900 flex items-center justify-center p-8 md:p-10 relative group">
+                        <div className="relative aspect-square w-full max-w-[480px] rounded-2xl overflow-hidden shadow-2xl border border-white/5">
                             <img
                                 src={imageUrl}
                                 alt="AI Generated Result"
@@ -76,7 +77,7 @@ const ResultModal = ({ isOpen, onClose, imageUrl, onDownload }) => {
                     </div>
 
                     {/* Actions Section */}
-                    <div className="w-full md:w-80 p-8 border-l border-white/5 flex flex-col justify-center gap-8 bg-white/[0.02]">
+                    <div className="w-full md:w-96 p-7 md:p-8 border-t md:border-t-0 md:border-l border-white/5 flex flex-col justify-center gap-5 bg-white/[0.02]">
                         <div className="space-y-2">
                             <h2 className="text-3xl font-black text-white tracking-tighter uppercase">Magic Done.</h2>
                             <p className="text-gray-500 text-sm font-medium">Your brand asset is ready for the world. Preview and download it below.</p>
@@ -109,7 +110,16 @@ const ResultModal = ({ isOpen, onClose, imageUrl, onDownload }) => {
                             </button>
                         </div>
 
-                        <div className="pt-4 border-t border-white/5">
+                        {pipelineInfo && (
+                            <PipelineInspector
+                                title={pipelineInfo.title}
+                                model={pipelineInfo.model}
+                                steps={pipelineInfo.steps}
+                                promptPreview={pipelineInfo.promptPreview}
+                            />
+                        )}
+
+                        <div className="pt-3 border-t border-white/5">
                             <p className="text-[10px] text-gray-600 font-bold uppercase tracking-widest">
                                 Tip: You can find all your previous generations in the History tab.
                             </p>

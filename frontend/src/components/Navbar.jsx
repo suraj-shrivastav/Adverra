@@ -1,13 +1,15 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Image as ImageIcon, Megaphone, AudioLines, LogOut, User, Zap } from 'lucide-react';
+import { Image as ImageIcon, Megaphone, AudioLines, LogOut, User, Zap, Layers } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import CaseStudyModal from './CaseStudyModal';
 
 const Navbar = () => {
     const { user, logout } = useAuth();
     const location = useLocation();
     const navigate = useNavigate();
     const [isProfileOpen, setIsProfileOpen] = React.useState(false);
+    const [isCaseStudyOpen, setIsCaseStudyOpen] = React.useState(false);
 
     const handleLogout = async () => {
         setIsProfileOpen(false);
@@ -32,7 +34,7 @@ const Navbar = () => {
                             <div className="w-10 h-10 sm:w-10 sm:h-10 bg-white/10 rounded-xl flex items-center justify-center group-hover:border-white/20 transition-all overflow-hidden">
                                 <img src="/adverra.jpg" alt="Adverra Logo" className="w-full h-full object-cover" />
                             </div>
-                            <span className="text-lg sm:text-xl font-black text-white tracking-tighter font-space uppercase">Adverra</span>
+                            <span className="text-lg sm:text-xl font-black text-white tracking-tighter font-outfit uppercase">Adverra</span>
                         </Link>
                     </div>
 
@@ -50,20 +52,29 @@ const Navbar = () => {
                                         }`}
                                 >
                                     <link.icon size={14} className={isActive ? 'text-black' : 'text-gray-600 group-hover:text-white'} />
-                                    <span className="text-[11px] font-black uppercase tracking-widest font-space">{link.name}</span>
+                                    <span className="text-[11px] font-black uppercase tracking-widest font-outfit">{link.name}</span>
                                 </Link>
                             );
                         })}
                     </div>
 
-                    {/* Right: User Info & Auth */}
-                    <div className="flex items-center justify-end gap-2 sm:gap-4 lg:gap-6 text-white">
+                    {/* Right: User Info & Case Study */}
+                    <div className="flex items-center justify-end gap-2 sm:gap-3 lg:gap-4 text-white">
+                        <button
+                            type="button"
+                            onClick={() => setIsCaseStudyOpen(true)}
+                            className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 bg-zinc-800/80 hover:bg-zinc-700/90 border border-zinc-300/35 hover:border-white/60 rounded-2xl text-[10px] sm:text-[11px] font-bold text-[#f4f4f0] uppercase tracking-widest transition-all font-outfit"
+                        >
+                            <Layers size={13} className="shrink-0" />
+                            <span className="hidden sm:inline">Case Study</span>
+                        </button>
+
                         {user ? (
                             <>
                                 {/* Credits - Simplified on mobile */}
                                 <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-2 bg-white/5 border border-white/10 rounded-2xl">
                                     <Zap size={12} className="sm:w-[14px] sm:h-[14px] text-white fill-white/20" />
-                                    <span className="text-[10px] sm:text-[11px] font-black font-space uppercase tracking-widest">
+                                    <span className="text-[10px] sm:text-[11px] font-black font-outfit uppercase tracking-widest">
                                         <span className="hidden sm:inline">100 Credits</span>
                                         <span className="sm:hidden">100</span>
                                     </span>
@@ -80,7 +91,7 @@ const Navbar = () => {
                         ) : (
                             <Link
                                 to="/login"
-                                className="px-4 sm:px-8 py-2 sm:py-2.5 bg-white text-black rounded-2xl text-[10px] sm:text-[11px] font-black uppercase tracking-widest hover:bg-gray-200 transition-all shadow-lg shadow-white/10 font-space"
+                                className="px-4 sm:px-8 py-2 sm:py-2.5 bg-white text-black rounded-2xl text-[10px] sm:text-[11px] font-black uppercase tracking-widest hover:bg-gray-200 transition-all shadow-lg shadow-white/10 font-outfit"
                             >
                                 Login
                             </Link>
@@ -106,7 +117,7 @@ const Navbar = () => {
                                             }`}
                                     >
                                         <link.icon size={18} className={isActive ? 'text-black' : 'text-gray-600'} />
-                                        <span className="text-[9px] font-black uppercase tracking-widest font-space">{link.name}</span>
+                                        <span className="text-[9px] font-black uppercase tracking-widest font-outfit">{link.name}</span>
                                     </Link>
                                 );
                             })}
@@ -136,7 +147,7 @@ const Navbar = () => {
                                     <User size={32} className="sm:w-10 sm:h-10 text-white/20" />
                                 </div>
                                 <div className="space-y-1">
-                                    <h3 className="text-xl sm:text-2xl font-black text-white tracking-tighter font-space uppercase break-words max-w-full">
+                                    <h3 className="text-xl sm:text-2xl font-black text-white tracking-tighter font-outfit uppercase break-words max-w-full">
                                         {user?.user_metadata?.name || user?.email?.split('@')[0] || 'Member'}
                                     </h3>
                                     <p className="text-gray-500 text-xs sm:text-sm font-medium break-all">{user?.email}</p>
@@ -146,12 +157,12 @@ const Navbar = () => {
                             {/* Info Stats */}
                             <div className="grid grid-cols-1 gap-3">
                                 <div className="p-3 sm:p-4 bg-white/5 border border-white/5 rounded-2xl flex items-center justify-between group hover:border-white/10 transition-all">
-                                    <span className="text-[10px] font-black text-gray-600 uppercase tracking-widest font-space">User Role</span>
-                                    <span className="text-[11px] font-black text-white uppercase tracking-widest font-space">Professional</span>
+                                    <span className="text-[10px] font-black text-gray-600 uppercase tracking-widest font-outfit">User Role</span>
+                                    <span className="text-[11px] font-black text-white uppercase tracking-widest font-outfit">Professional</span>
                                 </div>
                                 <div className="p-3 sm:p-4 bg-white/5 border border-white/5 rounded-2xl flex items-center justify-between group hover:border-white/10 transition-all">
-                                    <span className="text-[10px] font-black text-gray-600 uppercase tracking-widest font-space">Credits</span>
-                                    <span className="text-[11px] font-black text-white uppercase tracking-widest font-space">100 / ∞</span>
+                                    <span className="text-[10px] font-black text-gray-600 uppercase tracking-widest font-outfit">Credits</span>
+                                    <span className="text-[11px] font-black text-white uppercase tracking-widest font-outfit">100 / ∞</span>
                                 </div>
                             </div>
 
@@ -159,7 +170,7 @@ const Navbar = () => {
                             <div className="pt-4 space-y-3">
                                 <button
                                     onClick={handleLogout}
-                                    className="w-full flex items-center justify-center gap-3 px-6 py-3 sm:py-4 bg-white/[0.03] hover:bg-white/10 border border-white/5 hover:border-white/20 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] text-gray-400 hover:text-white transition-all font-space group"
+                                    className="w-full flex items-center justify-center gap-3 px-6 py-3 sm:py-4 bg-white/[0.03] hover:bg-white/10 border border-white/5 hover:border-white/20 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] text-gray-400 hover:text-white transition-all font-outfit group"
                                 >
                                     <LogOut size={16} className="group-hover:rotate-12 transition-transform" />
                                     Logout of Adverra
@@ -167,7 +178,7 @@ const Navbar = () => {
 
                                 <button
                                     onClick={() => setIsProfileOpen(false)}
-                                    className="w-full py-3 sm:py-4 text-[10px] font-black uppercase tracking-widest text-gray-600 hover:text-white transition-colors font-space"
+                                    className="w-full py-3 sm:py-4 text-[10px] font-black uppercase tracking-widest text-gray-600 hover:text-white transition-colors font-outfit"
                                 >
                                     Return to Session
                                 </button>
@@ -176,6 +187,11 @@ const Navbar = () => {
                     </div>
                 </div>
             )}
+
+            <CaseStudyModal
+                isOpen={isCaseStudyOpen}
+                onClose={() => setIsCaseStudyOpen(false)}
+            />
         </>
     );
 };

@@ -1,17 +1,154 @@
-import { Mic, Users, Sliders, Package, Target, Clock, Volume2, AudioLines, Headphones, ChevronDown, Check, History, Calendar, Loader2, Sliders as SlidersIcon, Volume2 as VolumeIcon, Download as DownloadIcon, Play as PlayIcon } from "lucide-react";
-import { useState, useRef } from "react";
+import { Mic, Users, Sliders, Package, Target, Clock, Volume2, Headphones, ChevronDown, Check, History, Calendar, Loader2, Sliders as SlidersIcon, Volume2 as VolumeIcon, Play as PlayIcon } from "lucide-react";
+import { useEffect, useState, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useDataStore } from "../store/useDataStore.js";
-import { buildMockAudioScript, createWavBlobUrl } from "../libs/showcaseGenerators.js";
+import { useWalkthrough } from "../context/WalkthroughContext";
+import { buildMockAudioScript, createWavBlobUrl, WALKTHROUGH_PRESETS } from "../libs/showcaseGenerators.js";
 import HistoryModal from "../components/common/HistoryModal";
+import WalkthroughTriggerButton from "../components/WalkthroughTriggerButton";
+import AudioWaveformPlayer from "../components/AudioWaveformPlayer";
+import PipelineInspector from "../components/PipelineInspector";
 
 export default function AudioPage() {
     const [speakerMode, setSpeakerMode] = useState("Single Speaker");
     const { audios, addAudio } = useDataStore();
+    const { isActive, mode, stepIndex } = useWalkthrough();
     const [showHistoryModal, setShowHistoryModal] = useState(false);
     const [selectedHistoryItem, setSelectedHistoryItem] = useState(null);
+    const [activeVariantId, setActiveVariantId] = useState("multi");
     const [isGenerating, setIsGenerating] = useState(false);
     const [hasAnyData, setHasAnyData] = useState(false);
+    const [syncedFields, setSyncedFields] = useState({});
+    const formRef = useRef(null);
+    const addedWalkthroughAudioRef = useRef(false);
+    const wasWalkthroughAudioRef = useRef(false);
+
+    useEffect(() => {
+        if (selectedHistoryItem?.compareVariants?.length) {
+            setActiveVariantId(selectedHistoryItem.compareVariants[0].id);
+        } else {
+            setActiveVariantId("multi");
+        }
+    }, [selectedHistoryItem]);
+
+    useEffect(() => {
+        if (!isActive || mode !== "audio") {
+            if (wasWalkthroughAudioRef.current) {
+                wasWalkthroughAudioRef.current = false;
+                setIsGenerating(false);
+            }
+            return;
+        }
+
+        wasWalkthroughAudioRef.current = true;
+        const fields = WALKTHROUGH_PRESETS.audio.fields;
+
+        const applyDomInputs = (names) => {
+            if (!formRef.current) return;
+            for (const key of names) {
+                const el = formRef.current.elements.namedItem(key);
+                if (el && "value" in el && fields[key] !== undefined) {
+                    el.value = fields[key];
+                }
+            }
+        };
+
+        const baseInputKeys = [
+            "productName",
+            "productCategory",
+            "primaryBenefit",
+            "secondaryBenefit",
+            "proofPoint",
+            "additionalProductDetails",
+            "targetAudienceRole",
+            "primaryPainPoint",
+            "scriptDuration",
+        ];
+
+        const speakerInputKeys = [
+            "speaker1Name",
+            "speaker1Tone",
+            "speaker2Name",
+            "speaker2Tone",
+        ];
+
+        if (stepIndex === 0) {
+            addedWalkthroughAudioRef.current = false;
+            setSpeakerMode("Single Speaker");
+            setSyncedFields({
+                listeningEnvironment: fields.listeningEnvironment,
+                campaignGoal: fields.campaignGoal,
+                formality: "50",
+                energy: "50",
+                emotion: "50",
+                humor: "50",
+                authority: "50",
+            });
+            applyDomInputs(baseInputKeys);
+            setHasAnyData(true);
+            setIsGenerating(false);
+            setShowHistoryModal(false);
+            setSelectedHistoryItem(null);
+        } else if (stepIndex === 1) {
+            setSpeakerMode(fields.speakerMode);
+            setSyncedFields({
+                listeningEnvironment: fields.listeningEnvironment,
+                campaignGoal: fields.campaignGoal,
+                speaker1Voice: fields.speaker1Voice,
+                speaker1Role: fields.speaker1Role,
+                speaker2Voice: fields.speaker2Voice,
+                speaker2Role: fields.speaker2Role,
+                formality: fields.formality,
+                energy: fields.energy,
+                emotion: fields.emotion,
+                humor: fields.humor,
+                authority: fields.authority,
+            });
+            applyDomInputs(baseInputKeys);
+            window.requestAnimationFrame(() => applyDomInputs(speakerInputKeys));
+            setHasAnyData(true);
+            setIsGenerating(false);
+            setShowHistoryModal(false);
+        } else if (stepIndex === 2) {
+            setSpeakerMode(fields.speakerMode);
+            setSyncedFields({
+                listeningEnvironment: fields.listeningEnvironment,
+                campaignGoal: fields.campaignGoal,
+                speaker1Voice: fields.speaker1Voice,
+                speaker1Role: fields.speaker1Role,
+                speaker2Voice: fields.speaker2Voice,
+                speaker2Role: fields.speaker2Role,
+                formality: fields.formality,
+                energy: fields.energy,
+                emotion: fields.emotion,
+                humor: fields.humor,
+                authority: fields.authority,
+            });
+            applyDomInputs(baseInputKeys);
+            window.requestAnimationFrame(() => applyDomInputs(speakerInputKeys));
+            setHasAnyData(true);
+            setIsGenerating(true);
+            setShowHistoryModal(false);
+        } else if (stepIndex === 3) {
+            setIsGenerating(false);
+            const demoAudio = {
+                id: 999301,
+                created_at: new Date().toISOString(),
+                ...WALKTHROUGH_PRESETS.audio.outputAudio,
+            };
+            if (!addedWalkthroughAudioRef.current) {
+                const exists = useDataStore
+                    .getState()
+                    .audios.some((a) => a.id === 999301);
+                if (!exists) {
+                    addAudio(demoAudio);
+                }
+                addedWalkthroughAudioRef.current = true;
+            }
+            setSelectedHistoryItem(demoAudio);
+            setShowHistoryModal(true);
+        }
+    }, [isActive, mode, stepIndex, addAudio]);
 
     const checkFormContent = (e) => {
         const form = e.currentTarget.closest('form');
@@ -61,7 +198,7 @@ export default function AudioPage() {
             {/* Main Content */}
             <div className="flex-1 h-full relative overflow-hidden">
                 {/* Fancy Background Text Overlay */}
-                <div className="absolute inset-0 overflow-hidden pointer-events-none select-none opacity-[0.05] z-0 font-space">
+                <div className="absolute inset-0 overflow-hidden pointer-events-none select-none opacity-[0.05] z-0 font-outfit">
                     <div className="absolute top-[5%] -left-20 -rotate-12 text-[120px] font-black tracking-tighter whitespace-nowrap">
                         VOICE → RESONANCE
                     </div>
@@ -76,8 +213,9 @@ export default function AudioPage() {
                     <Volume2 size={200} className="absolute bottom-10 right-[10%] rotate-6" />
                 </div>
 
-                {/* History Button */}
-                <div className="absolute top-4 right-4 md:top-8 md:right-8 z-20">
+                {/* Top Right Action Buttons */}
+                <div className="absolute top-4 right-4 md:top-8 md:right-8 z-20 flex items-center gap-2">
+                    <WalkthroughTriggerButton startMode="audio" variant="toolbar" />
                     <button
                         onClick={() => setShowHistoryModal(true)}
                         className="flex items-center gap-2 px-4 py-2 md:px-5 md:py-2.5 bg-black/60 border border-white/20 rounded-2xl text-xs font-semibold text-gray-300 hover:text-white hover:bg-black/80 hover:border-white/30 transition-all"
@@ -89,6 +227,7 @@ export default function AudioPage() {
 
                 <div className="h-full overflow-y-auto scrollbar-hide px-4 sm:px-6 py-8 md:py-10 relative z-10 flex flex-col items-center">
                     <form
+                        ref={formRef}
                         onSubmit={handleSubmit}
                         onChange={checkFormContent}
                         className="max-w-6xl w-full space-y-8 md:space-y-10"
@@ -103,6 +242,39 @@ export default function AudioPage() {
                                 high-performing audio scripts for TTS.
                             </p>
                         </div>
+
+                        {/* Featured Spoken Voice Ads Showcase */}
+                        {audios.length > 0 && (
+                            <Section title="Sample Voice Ads · Listen & Compare" icon={<Headphones size={20} />}>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                    {audios.slice(0, 3).map((sample) => (
+                                        <button
+                                            key={sample.id}
+                                            type="button"
+                                            onClick={() => {
+                                                setSelectedHistoryItem(sample);
+                                                setShowHistoryModal(true);
+                                            }}
+                                            className="p-4 rounded-2xl bg-black/50 border border-white/10 hover:border-white/30 hover:bg-white/[0.04] text-left transition-all flex items-center justify-between gap-3 group"
+                                        >
+                                            <div className="min-w-0 space-y-1">
+                                                <div className="text-xs font-bold text-white truncate">
+                                                    {sample.filename?.replace(/_/g, ' ')}
+                                                </div>
+                                                <div className="text-[11px] text-gray-400 truncate">
+                                                    {sample.compareVariants?.length > 1
+                                                        ? 'Compare Multi vs. Single Voice'
+                                                        : `${sample.script?.mode || 'Voice Spot'} · Studio Audio`}
+                                                </div>
+                                            </div>
+                                            <span className="w-8 h-8 rounded-xl bg-[#f4f4f0] text-zinc-950 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                                                <PlayIcon size={13} className="fill-current" />
+                                            </span>
+                                        </button>
+                                    ))}
+                                </div>
+                            </Section>
+                        )}
 
                         {/* Product Details */}
                         <Section title="Product Details" icon={<Package size={20} />}>
@@ -131,11 +303,11 @@ export default function AudioPage() {
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             <Section title="Brand Tone" icon={<Sliders size={20} />}>
                                 <div className="grid grid-cols-5 gap-2 sm:gap-4">
-                                    <VerticalSlider name="formality" label="FORMALITY" onAnyChange={() => setHasAnyData(true)} />
-                                    <VerticalSlider name="energy" label="ENERGY" onAnyChange={() => setHasAnyData(true)} />
-                                    <VerticalSlider name="emotion" label="EMOTION" onAnyChange={() => setHasAnyData(true)} />
-                                    <VerticalSlider name="humor" label="HUMOR" onAnyChange={() => setHasAnyData(true)} />
-                                    <VerticalSlider name="authority" label="AUTHORITY" onAnyChange={() => setHasAnyData(true)} />
+                                    <VerticalSlider name="formality" label="FORMALITY" value={syncedFields.formality} onAnyChange={() => setHasAnyData(true)} />
+                                    <VerticalSlider name="energy" label="ENERGY" value={syncedFields.energy} onAnyChange={() => setHasAnyData(true)} />
+                                    <VerticalSlider name="emotion" label="EMOTION" value={syncedFields.emotion} onAnyChange={() => setHasAnyData(true)} />
+                                    <VerticalSlider name="humor" label="HUMOR" value={syncedFields.humor} onAnyChange={() => setHasAnyData(true)} />
+                                    <VerticalSlider name="authority" label="AUTHORITY" value={syncedFields.authority} onAnyChange={() => setHasAnyData(true)} />
                                 </div>
                                 <div className="mt-6 pt-6 border-t border-white/10 text-center">
                                     <p className="text-[10px] text-gray-500 uppercase tracking-widest leading-relaxed">
@@ -195,11 +367,11 @@ export default function AudioPage() {
                                                     <Input name="speaker1Tone" label="Voice Tone" placeholder="confident" />
                                                 </div>
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                                    <ModernSelect name="speaker1Voice" label="Voice" options={["Zephyr — Bright", "Puck — Upbeat", "Charon — Informative", "Kore — Firm", "Fenrir — Excitable", "Leda — Youthful", "Orus — Firm", "Aoede — Breezy", "Callirrhoe — Easy-going", "Autonoe — Bright"]} onAnyChange={() => setHasAnyData(true)} />
+                                                    <ModernSelect name="speaker1Voice" label="Voice" value={syncedFields.speaker1Voice} options={["Zephyr — Bright", "Puck — Upbeat", "Charon — Informative", "Kore — Firm", "Fenrir — Excitable", "Leda — Youthful", "Orus — Firm", "Aoede — Breezy", "Callirrhoe — Easy-going", "Autonoe — Bright"]} onAnyChange={() => setHasAnyData(true)} />
                                                     <ModernSelect name="speaker1Language" label="Language" options={["English (US)", "English (UK)", "French"]} onAnyChange={() => setHasAnyData(true)} />
                                                 </div>
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                                    <ModernSelect name="speaker1Role" label="Role" options={["Host", "Expert", "Customer", "Narrator"]} onAnyChange={() => setHasAnyData(true)} />
+                                                    <ModernSelect name="speaker1Role" label="Role" value={syncedFields.speaker1Role} options={["Host", "Expert", "Customer", "Narrator"]} onAnyChange={() => setHasAnyData(true)} />
                                                 </div>
                                             </div>
                                             <div className="bg-black/60 border border-white/10 rounded-2xl p-4 space-y-4">
@@ -209,11 +381,11 @@ export default function AudioPage() {
                                                     <Input name="speaker2Tone" label="Voice Tone" placeholder="curious" />
                                                 </div>
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                                    <ModernSelect name="speaker2Voice" label="Voice" options={["Zephyr — Bright", "Puck — Upbeat", "Charon — Informative", "Kore — Firm", "Fenrir — Excitable", "Leda — Youthful", "Orus — Firm", "Aoede — Breezy", "Callirrhoe — Easy-going", "Autonoe — Bright"]} onAnyChange={() => setHasAnyData(true)} />
+                                                    <ModernSelect name="speaker2Voice" label="Voice" value={syncedFields.speaker2Voice} options={["Zephyr — Bright", "Puck — Upbeat", "Charon — Informative", "Kore — Firm", "Fenrir — Excitable", "Leda — Youthful", "Orus — Firm", "Aoede — Breezy", "Callirrhoe — Easy-going", "Autonoe — Bright"]} onAnyChange={() => setHasAnyData(true)} />
                                                     <ModernSelect name="speaker2Language" label="Language" options={["English (US)", "English (UK)", "French"]} onAnyChange={() => setHasAnyData(true)} />
                                                 </div>
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                                    <ModernSelect name="speaker2Role" label="Role" options={["Host", "Expert", "Customer", "Narrator"]} onAnyChange={() => setHasAnyData(true)} />
+                                                    <ModernSelect name="speaker2Role" label="Role" value={syncedFields.speaker2Role} options={["Host", "Expert", "Customer", "Narrator"]} onAnyChange={() => setHasAnyData(true)} />
                                                 </div>
                                             </div>
                                         </div>
@@ -233,6 +405,7 @@ export default function AudioPage() {
                                     <ModernSelect
                                         name="listeningEnvironment"
                                         label="Listening Environment"
+                                        value={syncedFields.listeningEnvironment}
                                         onAnyChange={() => setHasAnyData(true)}
                                         options={["Social Feed", "Podcast", "Radio", "Smart Speaker"]}
                                     />
@@ -241,7 +414,7 @@ export default function AudioPage() {
 
                             <Section title="Campaign Settings" icon={<Target size={20} />}>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <ModernSelect name="campaignGoal" label="Campaign Goal" onAnyChange={() => setHasAnyData(true)} options={["Awareness", "Conversion"]} />
+                                    <ModernSelect name="campaignGoal" label="Campaign Goal" value={syncedFields.campaignGoal} onAnyChange={() => setHasAnyData(true)} options={["Awareness", "Conversion"]} />
                                     <div>
                                         <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2">
                                             <Clock size={12} /> Duration
@@ -305,61 +478,76 @@ export default function AudioPage() {
                         <PlayIcon size={20} className="text-gray-600 group-hover:text-white transition-colors" />
                     </button>
                 )}
-                renderDetails={(item) => (
-                    <div className="h-full grid grid-cols-1 lg:grid-cols-2 gap-8">
+                renderDetails={(item) => {
+                    const variants = item.compareVariants || [];
+                    const activeVariant =
+                        variants.find((v) => v.id === activeVariantId) || variants[0] || null;
+                    const displayScript = activeVariant?.script || item.script;
+                    const displayUrl = activeVariant?.publicUrl || item.publicUrl;
+                    const formattedScriptText = [
+                        displayScript?.direction_line,
+                        ...(displayScript?.script_lines || []).map(
+                            (l) => `${l.speaker}: ${l.text}`
+                        ),
+                    ]
+                        .filter(Boolean)
+                        .join('\n');
+
+                    return (
                         <div className="space-y-6">
-                            <div className="flex items-center gap-3">
-                                <div className="p-2 rounded-lg bg-white/5 border border-white/10"><SlidersIcon size={18} className="text-gray-400" /></div>
-                                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Script</h3>
-                            </div>
-                            <div className="bg-black/40 border border-white/5 rounded-3xl p-6 space-y-4">
-                                <div className="text-[10px] text-gray-600 italic">Direction: {item.script?.direction_line}</div>
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                                 <div className="space-y-4">
-                                    {item.script?.script_lines?.map((line, idx) => (
-                                        <div key={idx} className="space-y-1">
-                                            <span className="text-[10px] font-bold text-white/40 uppercase">{line.speaker}:</span>
-                                            <p className="text-sm text-gray-300 leading-relaxed font-medium">{line.text}</p>
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 rounded-lg bg-white/5 border border-white/10"><SlidersIcon size={18} className="text-gray-400" /></div>
+                                        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+                                            Script · {displayScript?.mode || 'Voice Spot'}
+                                        </h3>
+                                    </div>
+                                    <div className="bg-black/40 border border-white/5 rounded-3xl p-6 space-y-4">
+                                        <div className="text-[11px] text-gray-500 italic">Direction: {displayScript?.direction_line}</div>
+                                        <div className="space-y-4">
+                                            {displayScript?.script_lines?.map((line, idx) => (
+                                                <div key={idx} className="space-y-1">
+                                                    <span className="text-[10px] font-bold text-white/50 uppercase">{line.speaker}:</span>
+                                                    <p className="text-sm text-gray-200 leading-relaxed font-medium">{line.text}</p>
+                                                </div>
+                                            ))}
                                         </div>
-                                    ))}
+                                    </div>
+                                </div>
+                                <div className="space-y-4 flex flex-col">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 rounded-lg bg-white/5 border border-white/10"><VolumeIcon size={18} className="text-gray-400" /></div>
+                                        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Playback & Voice Comparison</h3>
+                                    </div>
+                                    <div className="bg-black/40 border border-white/5 rounded-3xl p-5 sm:p-6 flex-1 flex flex-col justify-center">
+                                        <AudioWaveformPlayer
+                                            src={displayUrl}
+                                            filename={item.filename}
+                                            title={item.filename?.replace(/_/g, ' ')}
+                                            modeLabel={displayScript?.mode}
+                                            variants={variants}
+                                            activeVariantId={activeVariant?.id}
+                                            onSelectVariant={(variant) => setActiveVariantId(variant.id)}
+                                        />
+                                    </div>
                                 </div>
                             </div>
+
+                            <PipelineInspector
+                                title="Pipeline & Engineered Prompt"
+                                model="Gemini 3 Flash + TTS"
+                                steps={[
+                                    `Product Context (${item.context?.productName || 'Brand'})`,
+                                    `Mode (${displayScript?.mode || 'Multi Speaker'})`,
+                                    'Gemini 3 Flash Script Director',
+                                    'Gemini 2.5 Flash TTS (24kHz WAV)',
+                                ]}
+                                promptPreview={formattedScriptText}
+                            />
                         </div>
-                        <div className="space-y-6 flex flex-col">
-                            <div className="flex items-center gap-3">
-                                <div className="p-2 rounded-lg bg-white/5 border border-white/10"><VolumeIcon size={18} className="text-gray-400" /></div>
-                                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Playback</h3>
-                            </div>
-                            <div className="bg-black/40 border border-white/5 rounded-3xl p-8 flex-1 flex flex-col items-center justify-center space-y-8">
-                                <div className="p-4 rounded-2xl bg-white/5 border border-white/10">
-                                    <AudioLines size={60} className="text-gray-400" />
-                                </div>
-                                <audio controls className="w-full accent-white" src={item.publicUrl} />
-                                <button
-                                    onClick={async () => {
-                                        try {
-                                            const response = await fetch(item.publicUrl);
-                                            const blob = await response.blob();
-                                            const url = window.URL.createObjectURL(blob);
-                                            const a = document.createElement('a');
-                                            a.href = url;
-                                            a.download = `${item.filename || 'audio'}.wav`;
-                                            document.body.appendChild(a);
-                                            a.click();
-                                            document.body.removeChild(a);
-                                            window.URL.revokeObjectURL(url);
-                                        } catch (err) {
-                                            console.error('Download failed:', err);
-                                            window.open(item.publicUrl, '_blank');
-                                        }
-                                    }}
-                                    className="flex items-center gap-2 bg-white text-black px-6 py-3 rounded-2xl text-sm font-bold w-full justify-center hover:bg-gray-200 transition-all active:scale-95"
-                                >
-                                    <DownloadIcon size={18} /> Download Audio
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                )}
+                    );
+                }}
             />
         </div>
     );
@@ -400,6 +588,12 @@ function ModernSelect({ label, options, value, onChange, required = false, name,
     const [selectedValue, setSelectedValue] = useState(value || options[0]);
     const buttonRef = useRef(null);
     const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0, width: 0 });
+
+    useEffect(() => {
+        if (value !== undefined && value !== null && value !== "") {
+            setSelectedValue(value);
+        }
+    }, [value]);
 
     const handleSelect = (option) => {
         setSelectedValue(option);
@@ -451,8 +645,15 @@ function ModernSelect({ label, options, value, onChange, required = false, name,
     );
 }
 
-function VerticalSlider({ label, defaultValue = 50, name, onAnyChange }) {
-    const [value, setValue] = useState(defaultValue);
+function VerticalSlider({ label, defaultValue = 50, value: externalValue, name, onAnyChange }) {
+    const [value, setValue] = useState(externalValue ?? defaultValue);
+
+    useEffect(() => {
+        if (externalValue !== undefined && externalValue !== null) {
+            setValue(externalValue);
+        }
+    }, [externalValue]);
+
     return (
         <div className="flex flex-col items-center gap-2 sm:gap-3">
             <div className="text-[9px] sm:text-[10px] font-bold text-gray-400 uppercase tracking-widest text-center h-8 flex items-end leading-tight">{label}</div>
@@ -460,7 +661,7 @@ function VerticalSlider({ label, defaultValue = 50, name, onAnyChange }) {
             <div className="relative h-24 sm:h-32 flex flex-col items-center group">
                 <input type="range" min="0" max="100" value={value} onChange={(e) => { setValue(e.target.value); if (onAnyChange) onAnyChange(); }} className="vertical-slider h-full accent-white cursor-pointer opacity-70 group-hover:opacity-100 transition-opacity" style={{ writingMode: 'bt-lr', WebkitAppearance: 'slider-vertical', width: '6px' }} />
             </div>
-            <div className="text-xs font-mono font-bold text-white bg-white/10 border border-white/20 px-2 py-1 rounded-lg min-w-[2.5rem] text-center">{value}</div>
+            <div className="text-xs font-outfit tabular-nums font-bold text-white bg-white/10 border border-white/20 px-2 py-1 rounded-lg min-w-[2.5rem] text-center">{value}</div>
         </div>
     );
 }

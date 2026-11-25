@@ -1,6 +1,7 @@
 import React from 'react';
 import { Sparkles, Loader2, Clock } from 'lucide-react';
 import { useImageGenerationStore } from '../../store/useImageGenerationStore';
+import WalkthroughTriggerButton from '../WalkthroughTriggerButton';
 import PlatformSelector from './PlatformSelector';
 import ReferenceUploader from './ReferenceUploader';
 import VisualToneGrid from './VisualToneGrid';
@@ -201,11 +202,13 @@ const GenerationControls = ({
             {/* Footer */}
             <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 bg-black/90 backdrop-blur-xl border-t border-gray-900 flex flex-col sm:flex-row gap-4 sm:gap-0 justify-between items-stretch sm:items-center z-20">
                 <div className="flex flex-col">
-                    <span className="text-[10px] uppercase tracking-[0.2em] text-gray-600 font-black font-space">Estimated Power</span>
-                    <span className="text-white font-black text-xl tracking-tighter font-space">12 <span className="text-xs text-gray-500 font-medium">Credits</span></span>
+                    <span className="text-[10px] uppercase tracking-[0.2em] text-gray-600 font-black font-outfit">Estimated Power</span>
+                    <span className="text-white font-black text-xl tracking-tighter font-outfit">12 <span className="text-xs text-gray-500 font-medium">Credits</span></span>
                 </div>
 
                 <div className="flex items-center gap-3 sm:gap-4">
+                    <WalkthroughTriggerButton startMode="image" variant="pill" />
+
                     <button
                         onClick={() => {
                             useImageGenerationStore.getState().fetchHistory();

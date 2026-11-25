@@ -1,11 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import BrandSidebar from '../components/brand/BrandSidebar';
 import BrandModal from '../components/brand/BrandModal';
 import { useImageGenerationStore } from '../store/useImageGenerationStore';
 import { useDataStore } from '../store/useDataStore';
-import { buildMockCampaign } from '../libs/showcaseGenerators';
+import { useWalkthrough } from '../context/WalkthroughContext';
+import { buildMockCampaign, WALKTHROUGH_PRESETS } from '../libs/showcaseGenerators';
 import { Loader2, Send, Copy, Check, Instagram, Twitter, Linkedin, Facebook, Pin, Globe, History, X, Calendar, Megaphone, Menu } from 'lucide-react';
 import HistoryModal from '../components/common/HistoryModal';
+import WalkthroughTriggerButton from '../components/WalkthroughTriggerButton';
+import PipelineInspector from '../components/PipelineInspector';
 
 const CampaignGeneration = () => {
     const {
@@ -38,12 +41,69 @@ const CampaignGeneration = () => {
     const [isLoadingHistory] = useState(false);
     const [selectedHistoryItem, setSelectedHistoryItem] = useState(null);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const { isActive, mode, stepIndex } = useWalkthrough();
+    const addedWalkthroughCampaignRef = useRef(false);
+    const wasWalkthroughCampaignRef = useRef(false);
 
     const selectedBrand = brands.find(b => b.id == selectedBrandId);
 
     useEffect(() => {
         getAllBrands();
     }, [getAllBrands]);
+
+    useEffect(() => {
+        if (!isActive || mode !== 'campaign') {
+            if (wasWalkthroughCampaignRef.current) {
+                wasWalkthroughCampaignRef.current = false;
+                setIsGenerating(false);
+            }
+            return;
+        }
+
+        wasWalkthroughCampaignRef.current = true;
+        const preset = WALKTHROUGH_PRESETS.campaign;
+
+        if (stepIndex === 0) {
+            addedWalkthroughCampaignRef.current = false;
+            setSelectedBrandId(preset.brandId);
+            setPlatforms(preset.platforms);
+            setIsGenerating(false);
+            setShowResultModal(false);
+            setShowHistoryModal(false);
+        } else if (stepIndex === 1) {
+            setSelectedBrandId(preset.brandId);
+            setPlatforms(preset.platforms);
+            setProduct(preset.product);
+            setTargetAudience(preset.targetAudience);
+            setTone(preset.tone);
+            setPrompt(preset.prompt);
+            setIsGenerating(false);
+            setShowResultModal(false);
+            setShowHistoryModal(false);
+        } else if (stepIndex === 2) {
+            setIsGenerating(true);
+            setShowResultModal(false);
+            setShowHistoryModal(false);
+        } else if (stepIndex === 3) {
+            setIsGenerating(false);
+            setGeneratedCampaign(preset.outputCampaign);
+            setShowResultModal(true);
+            setShowHistoryModal(false);
+            if (!addedWalkthroughCampaignRef.current) {
+                const exists = useDataStore
+                    .getState()
+                    .campaigns.some((c) => c.id === 999201);
+                if (!exists) {
+                    addCampaign({
+                        id: 999201,
+                        created_at: new Date().toISOString(),
+                        campaign: preset.outputCampaign,
+                    });
+                }
+                addedWalkthroughCampaignRef.current = true;
+            }
+        }
+    }, [isActive, mode, stepIndex, setSelectedBrandId, addCampaign]);
 
     const handleBrandChange = (e) => {
         const value = e.target.value;
@@ -202,6 +262,27 @@ const CampaignGeneration = () => {
                     </div>
                 </div>
             </div>
+
+            <div className="mt-4 sm:mt-6 flex-shrink-0">
+                <PipelineInspector
+                    title="Pipeline & Engineered Prompt"
+                    model="Gemini 2.5 Flash"
+                    steps={[
+                        `Brand Identity (${selectedBrand?.title || 'Verve Botanics'})`,
+                        `Platform Rules (${platforms.join(', ')})`,
+                        'Persona & Tone Conditioning',
+                        'Structured JSON Schema',
+                    ]}
+                    promptPreview={[
+                        `Brand: ${selectedBrand?.title || 'Verve Botanics'} · Channels: ${platforms.join(', ')}`,
+                        `Product: ${product || campaign?.title || 'Brand Flagship'} · Tone: ${tone || 'On-Brand'}`,
+                        `Audience: ${campaign?.targetAudience || targetAudience || 'Target Buyers'}`,
+                        prompt ? `Brief: ${prompt}` : null,
+                    ]
+                        .filter(Boolean)
+                        .join('\n')}
+                />
+            </div>
         </div>
     );
 
@@ -247,7 +328,7 @@ const CampaignGeneration = () => {
 
             <div className="flex-1 flex flex-col h-full overflow-hidden relative">
                 {/* Fancy Background Text Overlay */}
-                <div className="absolute inset-0 overflow-hidden pointer-events-none select-none opacity-[0.05] z-0 font-space hidden lg:block">
+                <div className="absolute inset-0 overflow-hidden pointer-events-none select-none opacity-[0.05] z-0 font-outfit hidden lg:block">
                     <div className="absolute top-[5%] -left-20 -rotate-12 text-[120px] font-black tracking-tighter whitespace-nowrap">
                         STRATEGY → EXECUTION
                     </div>
@@ -273,8 +354,9 @@ const CampaignGeneration = () => {
                         PRECISION AT SCALE
                     </div>
                 </div>
-                {/* History Button */}
-                <div className="absolute top-4 right-4 lg:top-8 lg:right-8 z-10">
+                {/* Top Right Action Buttons */}
+                <div className="absolute top-4 right-4 lg:top-8 lg:right-8 z-10 flex items-center gap-2">
+                    <WalkthroughTriggerButton startMode="campaign" variant="toolbar" />
                     <button
                         onClick={fetchHistory}
                         className="flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 bg-black/40 border border-white/10 rounded-2xl text-xs font-semibold text-gray-400 hover:text-white hover:bg-black/60 transition-all"

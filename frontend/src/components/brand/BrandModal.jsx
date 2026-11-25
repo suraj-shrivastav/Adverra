@@ -18,7 +18,7 @@ const BrandModal = ({ isOpen, onClose, onSubmit, url, setUrl, isSubmitting }) =>
 
                 {/* Modal Header */}
                 <div className="p-8 pb-4 border-b border-white/5 relative">
-                    <h3 className="text-2xl font-black text-white tracking-tighter font-space uppercase">Add Brand Workspace</h3>
+                    <h3 className="text-2xl font-black text-white tracking-tighter font-outfit uppercase">Add Brand Workspace</h3>
                     <p className="text-gray-600 text-[10px] font-bold uppercase tracking-[0.2em] mt-2">Initialize through domain extraction</p>
                 </div>
 
@@ -46,13 +46,13 @@ const BrandModal = ({ isOpen, onClose, onSubmit, url, setUrl, isSubmitting }) =>
                     <button
                         onClick={onSubmit}
                         disabled={!url || isSubmitting}
-                        className="w-full py-4 rounded-2xl text-sm font-black uppercase tracking-widest text-black bg-white hover:bg-gray-200 transition-all disabled:opacity-30 disabled:cursor-not-allowed font-space shadow-[0_8px_32px_rgba(255,255,255,0.1)]"
+                        className="w-full py-4 rounded-2xl text-sm font-black uppercase tracking-widest text-black bg-white hover:bg-gray-200 transition-all disabled:opacity-30 disabled:cursor-not-allowed font-outfit shadow-[0_8px_32px_rgba(255,255,255,0.1)]"
                     >
                         {isSubmitting ? 'Extracting Identity...' : 'Initialize Brand'}
                     </button>
                     <button
                         onClick={onClose}
-                        className="w-full py-3 text-[10px] font-black uppercase tracking-widest text-gray-700 hover:text-white transition-colors font-space"
+                        className="w-full py-3 text-[10px] font-black uppercase tracking-widest text-gray-700 hover:text-white transition-colors font-outfit"
                     >
                         Cancel Connection
                     </button>

@@ -13,7 +13,7 @@ function MatrixColumn({ delay, duration, chars }) {
                 writingMode: "vertical-rl",
                 fontSize: "0.7rem",
                 color: "#1a1a1a",
-                fontFamily: "monospace",
+                fontFamily: "'Outfit', sans-serif",
                 letterSpacing: "0.3em",
                 position: "absolute",
                 top: 0,
@@ -71,7 +71,7 @@ export default function Working() {
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
-                fontFamily: "'Courier New', monospace",
+                fontFamily: "'Outfit', sans-serif",
                 overflow: "hidden",
                 position: "relative",
             }}
@@ -185,7 +185,7 @@ export default function Working() {
                         letterSpacing: "-0.02em",
                         lineHeight: 1,
                         marginBottom: "0.5rem",
-                        fontFamily: "'Courier New', monospace",
+                        fontFamily: "'Outfit', sans-serif",
                         position: "relative",
                         textShadow: glitch
                             ? "3px 0 #ff0000, -3px 0 #0000ff"

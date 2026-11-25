@@ -2,18 +2,26 @@
 
 export function makeSvgLogoDataUri(letter = 'A', bgColor = '#18181B', textColor = '#FFFFFF') {
   const safeLetter = String(letter || 'A').slice(0, 2).toUpperCase();
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128"><rect width="128" height="128" rx="28" fill="${bgColor}"/><text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-weight="800" font-size="56" fill="${textColor}">${safeLetter}</text></svg>`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128"><rect width="128" height="128" rx="28" fill="${bgColor}"/><text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-family="Outfit, sans-serif" font-weight="800" font-size="56" fill="${textColor}">${safeLetter}</text></svg>`;
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 }
 
 export const TONE_IMAGE_MAP = {
-  claymorphism_prompt: '/claymorphism_prompt.jpg',
+  claymorphism_prompt: '/showcase/ad_sneaker_clay_1795624906489.jpg',
   retro_cel_shaded_prompt: '/retro_cel_shaded_prompt.jpg',
-  cyber_organic_prompt: '/cyber_organic_prompt.jpg',
-  hand_drawn_prompt: '/hand_drawn_prompt.jpg',
-  three_d_prompt: '/three_d_prompt.jpg',
-  hyper_realistic_prompt: '/hyper_realistic_prompt.jpg',
+  cyber_organic_prompt: '/showcase/ad_adverra_cyber_1795624905661.jpg',
+  hand_drawn_prompt: '/showcase/ad_verve_botanical_1795624905084.jpg',
+  three_d_prompt: '/showcase/ad_lumina_3d_1795624904892.jpg',
+  hyper_realistic_prompt: '/showcase/ad_editorial_watch_1795624906913.jpg',
 };
+
+export const SHOWCASE_OUTPUT_GALLERY = [
+  '/showcase/ad_lumina_3d_1795624904892.jpg',
+  '/showcase/ad_verve_botanical_1795624905084.jpg',
+  '/showcase/ad_adverra_cyber_1795624905661.jpg',
+  '/showcase/ad_sneaker_clay_1795624906489.jpg',
+  '/showcase/ad_editorial_watch_1795624906913.jpg',
+];
 
 export const INITIAL_BRANDS = [
   {
@@ -92,22 +100,27 @@ export const INITIAL_BRANDS = [
 export const INITIAL_ASSETS = [
   {
     id: 101,
-    img_url: '/hyper_realistic_prompt.jpg',
-    created_at: new Date(Date.now() - 86400000 * 3).toISOString(),
+    img_url: '/showcase/ad_lumina_3d_1795624904892.jpg',
+    created_at: new Date(Date.now() - 86400000 * 4).toISOString(),
   },
   {
     id: 102,
-    img_url: '/three_d_prompt.jpg',
-    created_at: new Date(Date.now() - 86400000 * 2).toISOString(),
+    img_url: '/showcase/ad_verve_botanical_1795624905084.jpg',
+    created_at: new Date(Date.now() - 86400000 * 3).toISOString(),
   },
   {
     id: 103,
-    img_url: '/cyber_organic_prompt.jpg',
-    created_at: new Date(Date.now() - 86400000).toISOString(),
+    img_url: '/showcase/ad_adverra_cyber_1795624905661.jpg',
+    created_at: new Date(Date.now() - 86400000 * 2).toISOString(),
   },
   {
     id: 104,
-    img_url: '/claymorphism_prompt.jpg',
+    img_url: '/showcase/ad_sneaker_clay_1795624906489.jpg',
+    created_at: new Date(Date.now() - 86400000).toISOString(),
+  },
+  {
+    id: 105,
+    img_url: '/showcase/ad_editorial_watch_1795624906913.jpg',
     created_at: new Date(Date.now() - 3600000 * 5).toISOString(),
   },
 ];
@@ -115,7 +128,7 @@ export const INITIAL_ASSETS = [
 export const INITIAL_CAMPAIGNS = [
   {
     id: 201,
-    created_at: new Date(Date.now() - 86400000 * 2).toISOString(),
+    created_at: new Date(Date.now() - 86400000 * 3).toISOString(),
     campaign: {
       title: 'Lumina Studio Headphones — Silence Launch',
       actualCampaign:
@@ -127,7 +140,7 @@ export const INITIAL_CAMPAIGNS = [
   },
   {
     id: 202,
-    created_at: new Date(Date.now() - 86400000).toISOString(),
+    created_at: new Date(Date.now() - 86400000 * 2).toISOString(),
     campaign: {
       title: 'Adverra Multi-Modal Brand Hub Showcase',
       actualCampaign:
@@ -139,7 +152,7 @@ export const INITIAL_CAMPAIGNS = [
   },
   {
     id: 203,
-    created_at: new Date(Date.now() - 3600000 * 8).toISOString(),
+    created_at: new Date(Date.now() - 86400000).toISOString(),
     campaign: {
       title: 'Verve Botanics — Morning Barrier Serum',
       actualCampaign:
@@ -149,7 +162,177 @@ export const INITIAL_CAMPAIGNS = [
       bestTimeToPost: '7:00 PM EST',
     },
   },
+  {
+    id: 204,
+    created_at: new Date(Date.now() - 3600000 * 10).toISOString(),
+    campaign: {
+      title: 'Chronos Titanium — Precision Drop (LinkedIn)',
+      actualCampaign:
+        'Crafted from Grade-5 brushed titanium. Tested to hold the line for decades.\n\nOur limited-run chronograph pairs sapphire clarity with a whisper-quiet mechanical sweep—engineered for leaders who value substance over noise.\n\nExplore the collector’s specification sheet.',
+      targetAudience: 'Watch collectors, industrial design enthusiasts, and executives (30-55)',
+      hashtags: ['#Horology', '#MinimalistDesign', '#TitaniumCraft', '#CollectorEdition'],
+      bestTimeToPost: '8:15 AM EST',
+    },
+  },
 ];
+
+export const WALKTHROUGH_PRESETS = {
+  image: {
+    brandId: 2,
+    formPatch: {
+      platform: 'Instagram',
+      aspectRatio: '4:5',
+      objective: 'Conversion',
+      contentType: 'Product Photography',
+      emotion: 'Sophisticated',
+      audience: {
+        ageRange: '24-38',
+        mindset: 'Design-conscious audiophiles',
+      },
+      message: {
+        headline: 'PURE SOUND. ZERO NOISE.',
+        supportingText: 'Spatial acoustics & 48-hour battery life.',
+        language: 'English',
+      },
+      additionalPrompt:
+        'Matte black & brushed amber wireless headphones on dark obsidian pedestal, architectural rim lighting.',
+      visualStyle: {
+        toneId: 'three_d_prompt',
+        layout: 'Cinematic',
+        brandExpression: 'Bold',
+      },
+      logoUsage: 'Corner',
+    },
+    outputImage: '/showcase/ad_lumina_3d_1795624904892.jpg',
+  },
+  campaign: {
+    brandId: 3,
+    platforms: ['Instagram', 'LinkedIn'],
+    product: 'Morning Barrier Serum',
+    targetAudience: 'Skincare minimalists, 24-40',
+    tone: 'Warm, clinical & calm',
+    prompt:
+      'Highlight cold-pressed sea buckthorn and clinical ceramides for 24-hour barrier hydration.',
+    outputCampaign: {
+      title: 'Verve Botanics — Morning Barrier Serum (Instagram / LinkedIn)',
+      actualCampaign:
+        'Three drops before your morning espresso. Calm, resilient skin past midnight.\n\nVerve Botanics pairs cold-pressed sea buckthorn with clinical ceramides to lock in 24-hour barrier hydration—without heavy oils or synthetic fragrance.\n\nDiscover the three-step morning ritual today.',
+      targetAudience: 'Skincare minimalists, 24-40',
+      hashtags: [
+        '#VerveBotanics',
+        '#MorningBarrierSerum',
+        '#InstagramMarketing',
+        '#LinkedInMarketing',
+        '#CleanClinical',
+      ],
+      bestTimeToPost: '7:00 PM EST',
+    },
+  },
+  audio: {
+    fields: {
+      productName: 'Lumina One',
+      productCategory: 'Spatial Audio Headset',
+      primaryBenefit: 'Studio clarity with active silence',
+      secondaryBenefit: '48-hour battery life',
+      proofPoint: 'Rated #1 by 12,000+ creators',
+      additionalProductDetails:
+        'Memory-foam ear cushions, lossless USB-C audio, and multipoint pairing.',
+      targetAudienceRole: 'Remote Creators',
+      primaryPainPoint: 'Constant background distractions',
+      listeningEnvironment: 'Podcast',
+      campaignGoal: 'Conversion',
+      scriptDuration: '15',
+      speakerMode: 'Multi Speaker',
+      speaker1Name: 'Alex',
+      speaker1Tone: 'curious, conversational',
+      speaker1Voice: 'Zephyr — Bright',
+      speaker1Role: 'Host',
+      speaker2Name: 'Jordan',
+      speaker2Tone: 'confident, warm',
+      speaker2Voice: 'Charon — Informative',
+      speaker2Role: 'Expert',
+      formality: '40',
+      energy: '82',
+      emotion: '74',
+      humor: '35',
+      authority: '78',
+    },
+    outputAudio: {
+      filename: 'Lumina_One_Showcase_Ad',
+      publicUrl: '/audio/lumina-ad-spot.wav',
+      script: {
+        direction_line:
+          'Make Alex sound curious and conversational, and Jordan sound energetic and confident:',
+        mode: 'Multi Speaker',
+        script_lines: [
+          {
+            speaker: 'Alex',
+            text: 'Still losing deep-work hours to open-office chatter and constant background noise?',
+          },
+          {
+            speaker: 'Jordan',
+            text: 'Not since switching to Lumina One. It is spatial audio hardware engineered for studio clarity and active silence.',
+          },
+          {
+            speaker: 'Alex',
+            text: 'And it actually lasts through a full travel week?',
+          },
+          {
+            speaker: 'Jordan',
+            text: 'Forty-eight hours on a single charge, trusted by twelve thousand creators. Hear what matters with Lumina One.',
+          },
+        ],
+      },
+      compareVariants: [
+        {
+          id: 'multi',
+          label: 'Multi-Speaker Ad',
+          sublabel: 'Alex & Jordan · Conversational',
+          publicUrl: '/audio/lumina-ad-spot.wav',
+          script: {
+            direction_line:
+              'Make Alex sound curious and conversational, and Jordan sound energetic and confident:',
+            mode: 'Multi Speaker',
+            script_lines: [
+              {
+                speaker: 'Alex',
+                text: 'Still losing deep-work hours to open-office chatter and constant background noise?',
+              },
+              {
+                speaker: 'Jordan',
+                text: 'Not since switching to Lumina One. It is spatial audio hardware engineered for studio clarity and active silence.',
+              },
+              {
+                speaker: 'Alex',
+                text: 'And it actually lasts through a full travel week?',
+              },
+              {
+                speaker: 'Jordan',
+                text: 'Forty-eight hours on a single charge, trusted by twelve thousand creators. Hear what matters with Lumina One.',
+              },
+            ],
+          },
+        },
+        {
+          id: 'single',
+          label: 'Single Voiceover',
+          sublabel: 'Ava · Warm Narrator',
+          publicUrl: '/audio/lumina-single-spot.wav',
+          script: {
+            direction_line: 'Say in a warm, crisp studio narrator voice:',
+            mode: 'Single Speaker',
+            script_lines: [
+              {
+                speaker: 'Narrator',
+                text: 'Tired of noisy open offices breaking your creative flow? Meet Lumina One, the spatial audio headset engineered for studio clarity and active silence. With forty-eight hours of battery life and memory-foam comfort, over twelve thousand creators trust it every day. Hear what matters with Lumina One.',
+              },
+            ],
+          },
+        },
+      ],
+    },
+  },
+};
 
 export function createBrandFromDomain(domainInput, nextId = Date.now()) {
   const cleaned = String(domainInput || '')
@@ -208,8 +391,7 @@ export function selectMockAssetImage(toneId, fallbackIndex = 0) {
   if (toneId && TONE_IMAGE_MAP[toneId]) {
     return TONE_IMAGE_MAP[toneId];
   }
-  const allImages = Object.values(TONE_IMAGE_MAP);
-  return allImages[Math.abs(fallbackIndex) % allImages.length];
+  return SHOWCASE_OUTPUT_GALLERY[Math.abs(fallbackIndex) % SHOWCASE_OUTPUT_GALLERY.length];
 }
 
 export function buildMockCampaign({ prompt = {}, campaignData = {} }) {
@@ -218,9 +400,10 @@ export function buildMockCampaign({ prompt = {}, campaignData = {} }) {
   const audience = (prompt.targetAudience || '').trim() || 'Modern creators & decision makers';
   const tone = (prompt.tone || '').trim() || 'Confident & Direct';
   const goal = (prompt.content || '').trim();
-  const platforms = Array.isArray(campaignData.platforms) && campaignData.platforms.length > 0
-    ? campaignData.platforms
-    : ['Instagram'];
+  const platforms =
+    Array.isArray(campaignData.platforms) && campaignData.platforms.length > 0
+      ? campaignData.platforms
+      : ['Instagram'];
 
   const primaryPlatform = platforms[0];
   const timeByPlatform = {
@@ -232,10 +415,9 @@ export function buildMockCampaign({ prompt = {}, campaignData = {} }) {
     Web: '10:00 AM EST',
   };
 
-  const hookLine =
-    tone.toLowerCase().includes('playful')
-      ? `Stop scrolling—${product} just changed the game.`
-      : `Built for teams who refuse to settle for ordinary: meet ${product}.`;
+  const hookLine = tone.toLowerCase().includes('playful')
+    ? `Stop scrolling—${product} just changed the game.`
+    : `Built for teams who refuse to settle for ordinary: meet ${product}.`;
 
   const valueLine = goal
     ? `${goal.charAt(0).toUpperCase() + goal.slice(1)}${goal.endsWith('.') ? '' : '.'}`
@@ -248,8 +430,7 @@ export function buildMockCampaign({ prompt = {}, campaignData = {} }) {
 
   const actualCampaign = `${hookLine}\n\n${valueLine}\n\n${ctaLine}`;
 
-  const cleanTag = (str) =>
-    '#' + String(str || '').replace(/[^a-zA-Z0-9]/g, '');
+  const cleanTag = (str) => '#' + String(str || '').replace(/[^a-zA-Z0-9]/g, '');
 
   const rawTags = [
     cleanTag(brandName),
@@ -280,7 +461,11 @@ export function buildMockAudioScript(formValues = {}) {
   const energy = Number(formValues.energy ?? 65);
   const formality = Number(formValues.formality ?? 50);
   const deliveryAdjective =
-    energy >= 70 ? 'energetic and persuasive' : formality >= 70 ? 'polished and authoritative' : 'warm and confident';
+    energy >= 70
+      ? 'energetic and persuasive'
+      : formality >= 70
+      ? 'polished and authoritative'
+      : 'warm and confident';
 
   const filename = productName.replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 24) || 'Adverra_Ad';
 
@@ -341,8 +526,8 @@ export function buildMockAudioScript(formValues = {}) {
   };
 }
 
-// Generates a valid 16-bit mono PCM WAV file in memory (warm harmonic synth chord)
-export function createSynthesizedWavBytes(durationSeconds = 4.5, baseFreq = 220) {
+// Generates a valid 16-bit mono PCM WAV file with an upbeat commercial chord progression + pluck motif
+export function createSynthesizedWavBytes(durationSeconds = 7.5, baseFreq = 220) {
   const sampleRate = 22050;
   const numChannels = 1;
   const bitsPerSample = 16;
@@ -361,8 +546,8 @@ export function createSynthesizedWavBytes(durationSeconds = 4.5, baseFreq = 220)
   view.setUint32(4, 36 + dataSize, true);
   writeString(8, 'WAVE');
   writeString(12, 'fmt ');
-  view.setUint32(16, 16, true); // PCM chunk size
-  view.setUint16(20, 1, true); // PCM format
+  view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true);
   view.setUint16(22, numChannels, true);
   view.setUint32(24, sampleRate, true);
   view.setUint32(28, sampleRate * numChannels * (bitsPerSample / 8), true);
@@ -371,29 +556,62 @@ export function createSynthesizedWavBytes(durationSeconds = 4.5, baseFreq = 220)
   writeString(36, 'data');
   view.setUint32(40, dataSize, true);
 
+  const chords = [
+    [baseFreq, baseFreq * 1.25, baseFreq * 1.5, baseFreq * 1.875],
+    [baseFreq * 0.89, baseFreq * 1.12, baseFreq * 1.33, baseFreq * 1.68],
+    [baseFreq * 0.75, baseFreq * 1.0, baseFreq * 1.25, baseFreq * 1.5],
+    [baseFreq * 0.89, baseFreq * 1.12, baseFreq * 1.5, baseFreq * 1.875],
+  ];
+  const melody = [
+    baseFreq * 2,
+    baseFreq * 2.5,
+    baseFreq * 3,
+    0,
+    baseFreq * 2.67,
+    baseFreq * 2.5,
+    baseFreq * 2,
+    baseFreq * 1.5,
+  ];
+  const chordDur = durationSeconds / chords.length;
+  const beatSec = 60 / 110;
+  const stepDur = beatSec / 2;
+
   for (let i = 0; i < numSamples; i++) {
     const t = i / sampleRate;
-    const progress = t / durationSeconds;
-    const fadeIn = Math.min(1, t / 0.25);
-    const fadeOut = Math.min(1, (durationSeconds - t) / 0.5);
-    const envelope = fadeIn * fadeOut * 0.28;
+    const fadeIn = Math.min(1, t / 0.3);
+    const fadeOut = Math.min(1, (durationSeconds - t) / 0.7);
 
-    // Gentle major9 chord shimmer with subtle pulse
-    const pulse = 0.75 + 0.25 * Math.sin(2 * Math.PI * 1.5 * t);
-    const wave =
-      0.5 * Math.sin(2 * Math.PI * baseFreq * t) +
-      0.3 * Math.sin(2 * Math.PI * (baseFreq * 1.25) * t) +
-      0.2 * Math.sin(2 * Math.PI * (baseFreq * 1.5) * t) +
-      0.15 * Math.sin(2 * Math.PI * (baseFreq * 2.25) * t * (1 + 0.002 * progress));
+    const cIdx = Math.min(chords.length - 1, Math.floor(t / chordDur));
+    const cT = t - cIdx * chordDur;
+    const cEnv = Math.min(1, cT / 0.08) * Math.exp(-cT * 0.45);
+    let pad = 0;
+    for (const f of chords[cIdx]) {
+      pad += 0.18 * Math.sin(2 * Math.PI * f * t);
+    }
+    pad *= cEnv;
 
-    const sample = Math.max(-1, Math.min(1, wave * envelope * pulse));
+    const bT = t % beatSec;
+    const kick = 0.22 * Math.sin(2 * Math.PI * (90 * Math.exp(-bT * 18) + 42) * bT) * Math.exp(-bT * 14);
+
+    const stepIdx = Math.floor(t / stepDur);
+    const sT = t - stepIdx * stepDur;
+    const mFreq = melody[stepIdx % melody.length];
+    const pluck = mFreq > 0 ? 0.18 * Math.sin(2 * Math.PI * mFreq * t) * Math.exp(-sT * 7) : 0;
+
+    let chime = 0;
+    if (t > durationSeconds - 1.4) {
+      const ct = t - (durationSeconds - 1.4);
+      chime = 0.16 * Math.sin(2 * Math.PI * (baseFreq * 4) * ct) * Math.exp(-ct * 2.6);
+    }
+
+    const sample = Math.max(-1, Math.min(1, (pad + kick + pluck + chime) * fadeIn * fadeOut * 0.85));
     view.setInt16(44 + i * 2, Math.floor(sample * 32767), true);
   }
 
   return new Uint8Array(buffer);
 }
 
-export function createWavBlobUrl(durationSeconds = 4.5, baseFreq = 220) {
+export function createWavBlobUrl(durationSeconds = 7.5, baseFreq = 220) {
   const bytes = createSynthesizedWavBytes(durationSeconds, baseFreq);
   const blob = new Blob([bytes], { type: 'audio/wav' });
   return URL.createObjectURL(blob);
@@ -403,49 +621,73 @@ export function buildInitialAudios() {
   return [
     {
       id: 301,
-      filename: 'Lumina_One_Spot',
+      filename: 'Lumina_One_Ad_Spot',
       created_at: new Date(Date.now() - 86400000 * 2).toISOString(),
-      publicUrl: typeof URL !== 'undefined' && URL.createObjectURL ? createWavBlobUrl(5, 220) : '',
-      script: {
-        direction_line: 'Say in a warm and confident voice:',
-        mode: 'Single Speaker',
-        script_lines: [
-          {
-            speaker: 'Narrator',
-            text: 'Tired of noisy open offices breaking your flow? Lumina One is the spatial audio headset built for creators who want studio-grade focus anywhere. Forty-eight hours of battery, zero distractions. Hear what matters.',
-          },
-        ],
+      publicUrl: '/audio/lumina-ad-spot.wav',
+      script: WALKTHROUGH_PRESETS.audio.outputAudio.script,
+      compareVariants: WALKTHROUGH_PRESETS.audio.outputAudio.compareVariants,
+      context: {
+        productName: 'Lumina One',
+        speakerMode: 'Multi Speaker',
+        campaignGoal: 'Conversion',
+        listeningEnvironment: 'Podcast',
       },
-      context: { productName: 'Lumina One', speakerMode: 'Single Speaker' },
     },
     {
       id: 302,
-      filename: 'Adverra_Dialogue',
-      created_at: new Date(Date.now() - 3600000 * 14).toISOString(),
-      publicUrl: typeof URL !== 'undefined' && URL.createObjectURL ? createWavBlobUrl(5.5, 261.63) : '',
+      filename: 'Adverra_Brand_Dialogue',
+      created_at: new Date(Date.now() - 86400000).toISOString(),
+      publicUrl: '/audio/adverra-brand-spot.wav',
       script: {
         direction_line: 'Make Alex sound curious and Jordan sound energetic and persuasive:',
         mode: 'Multi Speaker',
         script_lines: [
           {
             speaker: 'Alex',
-            text: 'How did your team ship three full campaign launches in one afternoon?',
+            text: 'Wait, how did your team ship three full campaign launches in just one afternoon?',
           },
           {
             speaker: 'Jordan',
-            text: 'We moved our whole brand kit into Adverra.',
+            text: 'We moved our entire brand kit into Adverra. Once you add a company domain, it creates visuals, social copy, and voice spots together.',
           },
           {
             speaker: 'Alex',
-            text: 'Wait—images, social copy, and voiceovers all from one workspace?',
+            text: 'Everything stays on-brand across Instagram, LinkedIn, and audio?',
           },
           {
             speaker: 'Jordan',
-            text: 'Every asset, completely on-brand. Try Adverra today.',
+            text: 'Every palette, logo, and tone—matched automatically. Build your studio workflow with Adverra today.',
           },
         ],
       },
-      context: { productName: 'Adverra', speakerMode: 'Multi Speaker' },
+      context: {
+        productName: 'Adverra',
+        speakerMode: 'Multi Speaker',
+        campaignGoal: 'Awareness',
+        listeningEnvironment: 'Social Feed',
+      },
+    },
+    {
+      id: 303,
+      filename: 'Verve_Botanical_Radio',
+      created_at: new Date(Date.now() - 3600000 * 10).toISOString(),
+      publicUrl: '/audio/verve-botanical-spot.wav',
+      script: {
+        direction_line: 'Say in a calm, luminous, editorial voice:',
+        mode: 'Single Speaker',
+        script_lines: [
+          {
+            speaker: 'Narrator',
+            text: 'Three drops before your morning coffee. Calm, deeply hydrated skin well past midnight. Verve Botanics pairs cold-pressed sea buckthorn with clinical ceramides for twenty-four hour barrier resilience. Zero synthetic fragrance, pure botanical care. Discover your clean morning ritual with Verve Botanics.',
+          },
+        ],
+      },
+      context: {
+        productName: 'Verve Botanics',
+        speakerMode: 'Single Speaker',
+        campaignGoal: 'Awareness',
+        listeningEnvironment: 'Radio',
+      },
     },
   ];
 }

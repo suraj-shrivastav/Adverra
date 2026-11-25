@@ -32,7 +32,7 @@ const Signup = () => {
 
                 {/* Header */}
                 <div className="mb-10 text-center">
-                    <h1 className="text-4xl font-black text-white tracking-tighter font-space mb-3">
+                    <h1 className="text-4xl font-black text-white tracking-tighter font-outfit mb-3">
                         Join Adverra
                     </h1>
                     <p className="text-gray-500 text-sm font-medium tracking-wide">
@@ -87,7 +87,7 @@ const Signup = () => {
                     {/* Primary CTA */}
                     <button
                         type="submit"
-                        className="w-full rounded-2xl bg-white text-black py-4 text-sm font-black uppercase tracking-widest hover:bg-gray-200 transition-all shadow-[0_8px_32px_rgba(255,255,255,0.1)] active:scale-[0.98] font-space mt-4"
+                        className="w-full rounded-2xl bg-white text-black py-4 text-sm font-black uppercase tracking-widest hover:bg-gray-200 transition-all shadow-[0_8px_32px_rgba(255,255,255,0.1)] active:scale-[0.98] font-outfit mt-4"
                     >
                         Signup
                     </button>
