@@ -1,8 +1,9 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Image as ImageIcon, Megaphone, AudioLines, LogOut, User, Zap, Layers } from 'lucide-react';
+import { Image as ImageIcon, Megaphone, AudioLines, LogOut, User, Layers, Mail } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import CaseStudyModal from './CaseStudyModal';
+import ContactModal from './ContactModal';
 
 const Navbar = () => {
     const { user, logout } = useAuth();
@@ -10,6 +11,7 @@ const Navbar = () => {
     const navigate = useNavigate();
     const [isProfileOpen, setIsProfileOpen] = React.useState(false);
     const [isCaseStudyOpen, setIsCaseStudyOpen] = React.useState(false);
+    const [isContactOpen, setIsContactOpen] = React.useState(false);
 
     const handleLogout = async () => {
         setIsProfileOpen(false);
@@ -58,27 +60,28 @@ const Navbar = () => {
                         })}
                     </div>
 
-                    {/* Right: User Info & Case Study */}
+                    {/* Right: User Info & Case Study / Contact */}
                     <div className="flex items-center justify-end gap-2 sm:gap-3 lg:gap-4 text-white">
                         <button
                             type="button"
                             onClick={() => setIsCaseStudyOpen(true)}
-                            className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 bg-zinc-800/80 hover:bg-zinc-700/90 border border-zinc-300/35 hover:border-white/60 rounded-2xl text-[10px] sm:text-[11px] font-bold text-[#f4f4f0] uppercase tracking-widest transition-all font-outfit"
+                            className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/25 rounded-2xl text-[10px] sm:text-[11px] font-bold text-zinc-200 hover:text-white uppercase tracking-widest transition-all font-outfit"
                         >
                             <Layers size={13} className="shrink-0" />
                             <span className="hidden sm:inline">Case Study</span>
                         </button>
 
+                        <button
+                            type="button"
+                            onClick={() => setIsContactOpen(true)}
+                            className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/25 rounded-2xl text-[10px] sm:text-[11px] font-bold text-zinc-200 hover:text-white uppercase tracking-widest transition-all font-outfit"
+                        >
+                            <Mail size={13} className="shrink-0" />
+                            <span className="hidden sm:inline">Contact</span>
+                        </button>
+
                         {user ? (
                             <>
-                                {/* Credits - Simplified on mobile */}
-                                <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-2 bg-white/5 border border-white/10 rounded-2xl">
-                                    <Zap size={12} className="sm:w-[14px] sm:h-[14px] text-white fill-white/20" />
-                                    <span className="text-[10px] sm:text-[11px] font-black font-outfit uppercase tracking-widest">
-                                        <span className="hidden sm:inline">100 Credits</span>
-                                        <span className="sm:hidden">100</span>
-                                    </span>
-                                </div>
 
                                 {/* Profile Trigger */}
                                 <div
@@ -191,6 +194,11 @@ const Navbar = () => {
             <CaseStudyModal
                 isOpen={isCaseStudyOpen}
                 onClose={() => setIsCaseStudyOpen(false)}
+            />
+
+            <ContactModal
+                isOpen={isContactOpen}
+                onClose={() => setIsContactOpen(false)}
             />
         </>
     );

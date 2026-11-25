@@ -1,4 +1,4 @@
-import { X, Layers, Cpu, Database, Sparkles, ArrowRight, Image, Megaphone, AudioLines } from 'lucide-react';
+import { X, Layers, Cpu, Database, Sparkles, ArrowRight, Image, Megaphone, AudioLines, Github, Linkedin, Mail } from 'lucide-react';
 
 const STACK_GROUPS = [
   {
@@ -173,6 +173,45 @@ const CaseStudyModal = ({ isOpen, onClose }) => {
                   </p>
                 </div>
               ))}
+            </div>
+          </div>
+
+          {/* Author / Contact Bar */}
+          <div className="rounded-2xl bg-zinc-900/70 border border-white/10 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <div className="text-xs font-bold text-white uppercase tracking-wider">
+                Built by Suraj Shrivastav
+              </div>
+              <div className="text-xs text-zinc-400">
+                AI Full Stack Developer · NeuralArc.ai
+              </div>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <a
+                href="https://www.linkedin.com/in/suraj-shrivastav"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black/50 hover:bg-zinc-800 border border-white/15 text-xs font-semibold text-zinc-200 hover:text-white transition-all"
+              >
+                <Linkedin size={13} />
+                LinkedIn
+              </a>
+              <a
+                href="https://github.com/suraj-shrivastav"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black/50 hover:bg-zinc-800 border border-white/15 text-xs font-semibold text-zinc-200 hover:text-white transition-all"
+              >
+                <Github size={13} />
+                GitHub
+              </a>
+              <a
+                href="mailto:surajshrivastav07@gmail.com"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#f4f4f0] hover:bg-white text-xs font-bold text-zinc-950 transition-all"
+              >
+                <Mail size={13} />
+                Email
+              </a>
             </div>
           </div>
         </div>
